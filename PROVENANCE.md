@@ -4,10 +4,11 @@ Every part of the game, who made it, local or cloud, and the evidence. One row p
 history column of an old row (append a new row when a part is replaced). **Local** = produced by a model on the Mac Pro's GPUs.
 **Cloud** = produced by a cloud model. **Human** = the operator. **Third party** = existing licensed work.
 
-## The claim (draft)
-"The game, its plan, all its code and every fix were produced by local AI on a home server. The tools it runs in (harness, checker,
-archetype) were built with cloud AI, the way a studio buys its tools." Rows marked *production* must all be Local, Human or Third
-party before the claim is made.
+## The claim
+"Every line of the game's code was written by a local model on a home server. Cloud models played the senior developers:
+they wrote the plans, reviewed the builds and drafted the story outline and cover." (Hybrid approach, decided by the author on
+22 Nov 2026 after blind reviews showed local plans far weaker than a frontier model's; local planning to be revisited with a
+bigger GPU.) Rows marked *code* must all be Local.
 
 ## Production (what ends up in the game)
 

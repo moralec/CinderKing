@@ -4,34 +4,39 @@
 
 > **Every night, a bell tolls beneath the grave of Brindlemere.** Nobody in the village rang it. Nobody alive, anyway.
 
-A Game Boy-style fantasy RPG (Phaser 3, SRD 5.1 monsters and items) that I am building using local AI agents. The plan, every line
-of code and every fix are written by models running on a home server in my office, not in the cloud. I drive the vision, play
-each build, write what is wrong or missing, and the local agents turn that into the next round.
+A Game Boy-style fantasy RPG (Phaser 3, SRD 5.1 monsters and items) that I am building with a hybrid team of AI agents. Every line
+of code is written by a model running on a home server in my office. Cloud models play the senior developers: they write the plans
+and review each build. I drive the vision, play each build, write what is wrong or missing, and the team turns that into the next
+round.
 
 ## Why
 
-Frontier models can build this in one go. I wanted to know whether I could get to the same place with models I run
-myself: more rounds, more time and more of my own feedback, but no dependence on a cloud service that may get more expensive or
-harder to reach. This game is the test. The goal is a complete game I can honestly say was made 100 % with local AI.
+Frontier models can build this in one go. I wanted to know how much of that work models I run myself can take over: more rounds,
+more time and more of my own feedback, and less dependence on a cloud service that may get more expensive or harder to reach.
+
+I started out aiming for 100 % local. The coding works: a local model with a 3B-active-parameter footprint builds this game step
+by step. Planning does not, yet: local plans came out far weaker than a frontier model's in blind reviews. So the game is finished
+the hybrid way, with all the code local and the planning and reviews in the cloud, and local planning comes back when a bigger card
+lets me run larger models.
 
 ## How it is made
 
 - **Hardware:** a Mac Pro (2012) with two NVIDIA cards, a Tesla T4 (16 GB) and a Quadro RTX 4000 (8 GB), running llama.cpp.
 - **The builder:** Qwen3.6-35B-A3B (3B active parameters, about 80 tokens a second on both cards), driven by the
   Pi coding agent.
-- **Plans in small steps:** the local model writes the plan itself, feature by feature, with one test per step. Then it builds the
-  game one step at a time, each step in a fresh session, and a step only counts when its test passes. Fixed checks after every
-  feature make sure the earlier parts still work and that the maps are actually drawn.
-- **My feedback rounds:** after each build I play it and write notes. The local model turns the notes into small fix steps with
-  tests and builds them. Repeat until the game is good.
+- **The senior developers (cloud):** Claude writes each round's plan as small steps, one test per step, and reviews the build
+  afterwards. The plan and the tests are the hand-over: the local model never sees the cloud, only the next step and its test.
+- **The builder at work:** the local model builds the game one step at a time, each step in a fresh session, and a step only
+  counts when its test passes. Fixed checks make sure the earlier parts still work and that the maps are actually drawn.
+- **My feedback rounds:** after each build I play it and write notes. They become small fix steps with tests, which the local
+  model builds. Repeat until the game is good.
 - **Art:** free pixel-art packs (Kenney Tiny Dungeon, DawnLike), chosen in a blind test against AI-generated sprites. A local vision
-  model matches each monster and item to its sprite.
+  model and a Claude review matched each monster and item to its sprite.
 - **Story:** "The Cinder King", an original story in three acts and eight chapters: a haunted crypt, a cult that sings to wake a
   dragon, a broken blade to reforge, and a villain who has been waiting three hundred years. The outline is in `story/`.
 
-`PROVENANCE.md` records who made each part, local or cloud, and when. Some of the tools around the game (the test harness, the
-starting skeleton, the story outline and the cover) were made with cloud AI; the ledger says exactly which, so the claim can be
-checked line by line.
+`PROVENANCE.md` records who made each part, local or cloud, and when, so the claim ("every line of code written by local AI")
+can be checked line by line.
 
 ## Play
 
