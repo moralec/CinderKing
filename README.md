@@ -5,8 +5,8 @@
 > **Every night, a bell tolls beneath the grave of Brindlemere.** Nobody in the village rang it. Nobody alive, anyway.
 
 A Game Boy-style fantasy RPG (Phaser 3, SRD 5.1 monsters and items) that I am building using local AI agents. The plan, every line
-of code and every fix are written by models running on a home server in my office, not in the cloud. My part is the direction: I
-play each build, write what is wrong or missing, and the local agents turn that into the next round.
+of code and every fix are written by models running on a home server in my office, not in the cloud. I drive the vision, play
+each build, write what is wrong or missing, and the local agents turn that into the next round.
 
 ## Why
 
