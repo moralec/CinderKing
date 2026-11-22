@@ -3,6 +3,15 @@
 // Add Map and Credits entries before Save
 MENU_OPTS.splice(MENU_OPTS.indexOf('Save'), 0, 'Map', 'Credits');
 
+// Credits pages
+Menu.cred = 0;
+Menu.credits = [
+  'Rules, monsters,\nitems: System\nReference Document\n5.1, Wizards of\nthe Coast LLC,\nCC-BY-4.0.',
+  'Sprites: DawnLike\nv1.81 by\nDragonDePlatino.\nPalette by\nDawnBringer.\nCC-BY 4.0.',
+  'Tiles: Tiny Town\nand Tiny Dungeon\nby Kenney, CC0.\nFont: Press Start\n2P, OFL 1.1.\nEngine: Phaser 3,\nMIT.',
+  'World and story:\noriginal.\nCode written by a\nlocal model\n(Qwen3.6-35B-A3B);\nplans and reviews\nby Claude.\nCover: Gemini 3.1\nFlash Image.'
+];
+
 // Fit text to 10 lines of 18 chars
 function fit(text) {
   return Menu.body.getWrappedText(text).slice(0, 10).join('\n');
@@ -29,15 +38,18 @@ wrap(Menu, 'text', old => () => {
         const step = mainQuest.steps[stage];
         lines.push(step.log || '');
       }
-    }
-    lines.push('SIDE:');
-    const activeSide = quests.side.filter(function(q) { return Tales.status(q) === 'active'; });
-    if (activeSide.length === 0) {
-      lines.push('(none yet)');
     } else {
-      for (const q of activeSide) {
-        lines.push(q.name);
-      }
+      lines.push('All ' + DB.world.quests.main.length + ' chapters done.');
+    }
+    // Count done side quests
+    let doneSide = 0;
+    for (const q of quests.side) {
+      if (Tales.status(q) === 'done') doneSide++;
+    }
+    lines.push('SIDE ' + doneSide + '/' + quests.side.length + ' done');
+    const activeSide = quests.side.filter(function(q) { return Tales.status(q) === 'active'; });
+    for (const q of activeSide) {
+      lines.push(q.name);
     }
     return fit(lines.join('\n'));
   }
@@ -49,7 +61,7 @@ wrap(Menu, 'text', old => () => {
     return fit('MAP\n\n\n\n\n\n\n\n' + zoneName + '\n' + visitedCount + ' of ' + totalZones + ' seen');
   }
   if (o === 'Credits') {
-    return fit('CREDITS\nRules, monsters, items: System Reference Document 5.1, Wizards of the Coast LLC, CC-BY-4.0.\nWorld and story: original.');
+    return fit('CREDITS ' + (Menu.cred + 1) + '/' + Menu.credits.length + '\n' + Menu.credits[Menu.cred]);
   }
   if (o === 'Party') {
     return fit(old() + '\nGold ' + G.gold + ' gp');
@@ -57,10 +69,11 @@ wrap(Menu, 'text', old => () => {
   return fit(old());
 });
 
-// Wrap Menu.select: A on Quest, Map, Credits does nothing
+// Wrap Menu.select: A on Quest, Map does nothing; A on Credits cycles pages
 wrap(Menu, 'select', old => () => {
   const o = MENU_OPTS[Menu.i];
-  if (o === 'Quest' || o === 'Map' || o === 'Credits') return;
+  if (o === 'Quest' || o === 'Map') return;
+  if (o === 'Credits') { Menu.cred = (Menu.cred + 1) % Menu.credits.length; Menu.draw(); return; }
   old();
 });
 
@@ -68,4 +81,9 @@ wrap(Menu, 'select', old => () => {
 UI_BUILD.push(function() {
   panel(Menu.box.list[0], 172, 4, 80, 126);
   Menu.body.setWordWrapWidth(150);
+});
+
+// SETUP: add credits pages to the hook
+SETUP.push(function() {
+  hook.credits += '\n' + Menu.credits.join('\n').replace(/\n/g, ' ');
 });

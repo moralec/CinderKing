@@ -39,3 +39,19 @@
 - [x] 37 js/battleview.js: d20/d8 labels below log, action bar not cut
 - [x] 38 js/shopview.js: prices fit at right edge, hint line always shows
 - [x] 39 PLAN.md: all 38 tests pass, round 4 complete
+- [x] 40 data/world.json: chapters 2 and 3 story lines (pale silver, the dark lamp)
+- [x] 41 data/world.json: chapters 4, 5 and 6 story lines (breathless voice, broken blade, forge burns red)
+- [x] 42 data/world.json: chapters 7 and 8 story lines (Cantor was voice, note signed V, homecoming)
+- [x] 43 data/world.json: side quests point at main story; Pale Lady; five people's lines; intro
+- [x] 44 data/world.json: new tile lists for snow, coast, desert, volcanic, ruins, swamp
+- [x] 45 js/sprites.js: DawnLike sheets and data/sprites.json; Sprites.monster(id), Sprites.item(id)
+- [x] 46 js/foelook.js: battle draws the foe with its own picture
+- [x] 47 js/shopview.js: shop shows the picture of the item under the cursor
+- [x] 48 js/itemicons.js: Items page shows a picture beside every thing carried
+- [x] 49 js/platino.js: Platino is hidden once; 10th cast into the pond
+- [x] 50 js/swing.js, js/battleview.js: battle log names the monster, never "Foe"
+- [x] 51 js/pack.js: control strip shows HP, level and gold; no "ITEMS 0/3"
+- [x] 52 js/pages.js: Quest page shows main quest line always; side quests as count
+- [x] 53 js/title.js: title screen with cover and "Press START"
+- [x] 54 js/pages.js: Credits pages with SRD, DawnLike, Kenney, font, and credits
+- [x] 55 PLAN.md: the gate; all 53 tests pass

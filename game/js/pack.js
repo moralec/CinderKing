@@ -11,5 +11,5 @@ Menu.move = dir => { const now = Date.now(), dy = DIRS[dir][1], n = MENU_OPTS.le
 Menu.select = () => { const o = MENU_OPTS[Menu.i];
   if (o === 'Items') { if (!Bag.use(DRAUGHT)) say([count(DRAUGHT) ? 'HP is already full.' : `No ${DRAUGHT} in the bag.`]); Menu.draw(); }
   else if (o !== 'Party' && o !== 'Quest') menuSelect(); };
-UI_BUILD.push(ui => { panel(Menu.box.list[0], 172, 4, 80, 98); const hp = txt(ui, 128, 154, '', '#f8f8e8').setOrigin(0.5);
-  ui.events.on('update', () => { const h = G.hero; hp.setText(inBattle() ? `START: Heal x${count(DRAUGHT)}` : `HP ${h.hp}/${h.maxHp}`); }); });
+UI_BUILD.push(ui => { panel(Menu.box.list[0], 172, 4, 80, 98); const hp = txt(ui, 128, 154, '', '#f8f8e8').setOrigin(0.5); ui.hpLine = hp;
+  ui.events.on('update', () => { const h = G.hero, n = count(DRAUGHT); hp.setText(inBattle() && n > 0 ? `START: Heal x${n}` : `HP ${h.hp}/${h.maxHp}`); ui.counter.setText(`Lv ${h.level}  ${Math.floor(G.gold || 0)} gp`); }); });

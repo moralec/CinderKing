@@ -2,6 +2,15 @@
 
 (function () {
 
+  Battle.short = name => {
+    const s = String(name);
+    if (s.length <= 16) return s;
+    const cut = s.slice(0, 17);
+    const sp = cut.lastIndexOf(' ');
+    if (sp > 0) return cut.slice(0, sp).replace(/,$/, '');
+    return s.slice(0, 16);
+  };
+
   function strike(who, bonus, ac, damage, extra) {
     const value = roll(20);
     const total = value + bonus;
@@ -10,8 +19,12 @@
     if (hit) {
       dmg = Math.max(1, rollDice(damage, value === 20) + (extra ? rollDice(extra) : 0));
     }
-    const tag = who === 'You' ? 'You' : 'Foe';
-    G.battle.log.push(`${tag} d20 ${value}+${bonus}=${total} ${hit ? 'HIT' : 'MISS'}`);
+    const res = hit ? 'HIT' : 'MISS';
+    if (who === 'You') {
+      G.battle.log.push(`You roll ${value}+${bonus}=${total} ${res}`);
+    } else {
+      G.battle.log.push(`${Battle.short(G.battle.enemy.name)} rolls ${total} ${res}`);
+    }
     return { roll: { die: 20, value, mod: bonus, total }, hit, dmg };
   }
 

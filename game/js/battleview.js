@@ -12,7 +12,7 @@ const BattleView = {
     V.bars = ui.add.graphics();
     V.foe = ui.add.sprite(216, 26, 'dun', 108).setScale(3); V.me = ui.add.sprite(28, 62, 'dun', 88).setScale(2);
     V.foeTxt = txt(ui, 10, 9, ''); V.meTxt = txt(ui, 54, 51, '');
-    V.log = ui.add.text(10, 119, '', { ...FONT, color: '#203020', lineSpacing: 4 });
+    V.log = ui.add.text(8, 119, '', { ...FONT, color: '#203020', lineSpacing: 4 });
     V.d20 = C(23, 95, '?'); V.dmg = C(51, 95, '-');
     V.foeD20 = C(205, 95, '?'); V.foeDmg = C(233, 95, '-');
     V.foeD20Lbl = C(205, 109, 'd20'); V.foeDmgLbl = C(233, 109, 'd8');
@@ -29,7 +29,7 @@ const BattleView = {
     V.meTxt.setText(`${h.name} Lv ${h.level}\nHP ${h.hp}/${h.maxHp} AC ${Rules.ac(h)}`);
     V.d20.setText(b.lastRoll ? String(b.lastRoll.value) : '?'); V.dmg.setText(b.lastDmg != null ? String(b.lastDmg) : '-');
     V.foeD20.setText(b.foeRoll ? String(b.foeRoll.value) : '?'); V.foeDmg.setText(b.foeDmg != null ? String(b.foeDmg) : '-');
-    V.log.setText(b.log.slice(-2).map(l => l.slice(0, 29)).join('\n'));
+    V.log.setText(b.log.slice(-2).map(l => l.slice(0, 30)).join('\n'));
     V.bars.clear().fillStyle(0x203020).fillRect(10, 32, 128, 4).fillRect(54, 74, 128, 4)
       .fillStyle(0x58a048).fillRect(10, 32, 128 * Math.max(0,e.hp) / e.maxHp, 4).fillRect(54, 74, 128 * Math.max(0,h.hp) / h.maxHp, 4); } };
 UI_BUILD.push(ui => BattleView.build(ui));

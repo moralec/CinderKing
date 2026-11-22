@@ -19,7 +19,8 @@
   "story": [
    "Three hundred years ago the red dragon Vharaxis burnt the kingdom of Thornreach in one night.",
    "A dwarf-forged blade of star-iron and glacier ice, Winter's Tooth, drove him into Mount Cindermaw. The blade broke; the Cindergate was built to seal him in.",
-   "Now a cult, the Ashen Choir, sings to wake him. It starts with a bell tolling under a village graveyard."
+   "Now a cult, the Ashen Choir, sings to wake him. It starts with a bell tolling under a village graveyard.",
+   "Someone opened Thornreach's gates that night. No one ever learned who."
   ]
  },
  "biomes": {
@@ -28,14 +29,14 @@
    "plains": {"tint": "#f0eeb0", "ground": ["t:0", "t:1", "t:2", "t:2"], "path": ["t:25"], "solid": ["t:28", "t:5"], "scatter": ["t:43", "t:2"], "danger": "t:134", "build": "open grass with many flowers, few lone trees, wide fields of tall grass, a road, fences t:80-82 here and there"},
    "hills": {"tint": "#c8d4a0", "ground": ["t:1", "t:0", "t:43"], "path": ["t:40", "t:41"], "solid": ["t:126", "t:106", "t:28"], "scatter": ["t:43", "t:39"], "danger": "t:134", "build": "grass broken by stony ground t:43, ridges of rock (t:126 in short rows), logs, few trees"},
    "mountain": {"tint": "#b4b4c8", "ground": ["t:109", "t:43"], "path": ["t:109"], "solid": ["t:126", "d:40"], "scatter": ["d:42", "t:43"], "danger": "d:42", "build": "bare stone floor t:109 with cliff walls (t:126 / d:40 in thick bands), narrow passes, rubble d:42"},
-   "snow": {"tint": "#e6f2ff", "ground": ["t:109", "t:109", "t:43"], "path": ["t:109"], "solid": ["t:16", "t:126", "t:132"], "scatter": ["t:43"], "danger": "t:43", "build": "white ground (t:109 under a pale tint), a few pines t:16, frozen pools t:132 (solid), ice walls t:126"},
-   "coast": {"tint": null, "ground": ["d:48", "d:50", "d:53"], "path": ["d:53"], "solid": ["t:132", "t:106", "t:107"], "scatter": ["d:49", "d:51", "t:135"], "danger": "d:49", "build": "sand d:48-53 with the sea (t:132/t:133, animated, solid) filling the side that faces the world's edge, shore tiles t:135, driftwood t:106, barrels"},
-   "swamp": {"tint": "#7f9a66", "ground": ["t:1", "t:134", "t:0"], "path": ["t:41"], "solid": ["t:132", "t:27", "t:5"], "scatter": ["t:29", "t:134"], "danger": "t:134", "build": "dark wet grass, many small pools t:132 (solid), dead trees t:27, mushrooms, reeds of tall grass everywhere"},
+   "snow": {"tint": "#e6f2ff", "ground": ["t:109", "t:109", "t:109"], "path": ["t:109"], "solid": ["t:4", "t:28", "t:132"], "scatter": ["t:97"], "danger": "t:121", "build": "white ground (t:109 under a pale tint) with drift ridges t:97, pines t:4 and t:28, frozen pools t:132 (solid); deep drifts t:121 are the danger tile; no grass"},
+   "coast": {"tint": null, "ground": ["d:48", "d:50", "d:53"], "path": ["d:53"], "solid": ["t:132", "t:132", "t:106"], "scatter": ["d:49", "d:51", "t:135"], "danger": "d:49", "build": "sand d:48-53 with pools of sea water t:132 (solid) and driftwood t:106, shore tiles t:135; no barrels"},
+   "swamp": {"tint": "#7f9a66", "ground": ["t:1", "t:134", "t:0"], "path": ["t:41"], "solid": ["t:132", "t:27", "t:132"], "scatter": ["t:29", "t:134"], "danger": "t:134", "build": "dark wet grass, many small pools t:132 (solid), dead trees t:27, mushrooms, reeds of tall grass everywhere"},
    "jungle": {"tint": "#58c878", "ground": ["t:1", "t:2"], "path": ["t:39"], "solid": ["t:4", "t:16", "t:5", "t:132"], "scatter": ["t:29", "t:2"], "danger": "t:134", "build": "very dense trees and bushes (half the tiles), a stream t:132, small clearings, tall grass"},
-   "desert": {"tint": "#ffe8b4", "ground": ["d:48", "d:50", "d:53"], "path": ["d:53"], "solid": ["t:5", "d:65"], "scatter": ["d:49", "d:51", "d:52"], "danger": "d:51", "build": "open sand d:48-53, very few obstacles (dry scrub t:5, old stones), rough sand d:51 as the danger tile"},
+   "desert": {"tint": "#ffe8b4", "ground": ["d:48", "d:50", "d:48"], "path": ["d:53"], "solid": ["d:42", "t:17"], "scatter": ["d:49", "d:52", "d:52"], "danger": "d:51", "build": "open sand d:48-50 with dune ridges d:52, rocks d:42 and thorny desert plants t:17 as the few obstacles; rough sand d:51 as the danger tile; no gravestones"},
    "canyon": {"tint": "#ffb890", "ground": ["d:48", "d:52", "d:50"], "path": ["d:53"], "solid": ["d:40", "d:57", "d:58", "d:59"], "scatter": ["d:49", "d:42"], "danger": "d:52", "build": "sand floor between long rock walls (d:40, d:57-59) that form corridors and mesas"},
-   "volcanic": {"tint": "#ff8866", "ground": ["d:0", "d:1", "d:2", "d:3"], "path": ["d:0"], "solid": ["d:40", "t:132"], "scatter": ["d:12", "d:24", "d:13"], "danger": "d:13", "build": "dark burnt earth d:0-3 with rubble d:12 / d:24, rivers of lava (t:132 under a red tint, solid), black rock d:40"},
-   "ruins": {"tint": "#d0d0c0", "ground": ["t:109", "t:0", "t:109"], "path": ["t:109"], "solid": ["t:126", "t:99", "t:100", "t:101", "d:18"], "scatter": ["d:42", "t:43", "t:1"], "danger": "d:42", "build": "stone floors t:109 broken by grass, stretches of wall t:126 with battlements t:99-101, arches t:111-114, pillars d:18, broken floor d:42"},
+   "volcanic": {"tint": "#ff8866", "ground": ["d:0", "d:0", "d:0", "d:0"], "path": ["d:0"], "solid": ["d:50", "d:42"], "scatter": ["d:24"], "danger": "d:12", "build": "dark burnt earth d:0, pools of lava (d:50 under the red tint glows orange, solid), rocks d:42, rubble d:24; smouldering ground d:12 as the danger tile; no brick walls"},
+   "ruins": {"tint": "#d0d0c0", "ground": ["t:109", "t:0", "t:109"], "path": ["t:109"], "solid": ["t:126", "t:99", "t:100", "t:101", "d:65"], "scatter": ["t:43", "t:1", "t:1"], "danger": "t:43", "build": "stone floors t:109 broken by grass, stretches of wall t:126 with battlements t:99-101, old gravestones d:65, stones in the grass t:43 (also the danger tile)"},
    "graveyard": {"tint": "#a8b8a0", "ground": ["t:1", "t:0"], "path": ["t:40"], "solid": ["d:65", "d:64", "t:27", "t:44", "t:45", "t:46"], "scatter": ["t:29", "t:43"], "danger": "t:134", "build": "rows of gravestones d:65 and stone crosses d:64, fenced plots, dead trees t:27, a mausoleum of t:126"}
   },
  "zones": [
@@ -124,12 +125,12 @@
    {"id": "canyon-trader-vex", "name": "Vex", "zone": "redrock-canyon", "role": "lore", "title": "kobold trader", "sprite": {"sheet": "dungeon", "frame": 112, "tint": "#ff9060"}, "lines": ["Vex sells nothing today. Vex only warns: wyvern nests up high.", "Big-folk get lost in red rock. Kobolds never lost."]},
    {"id": "salt-prospector-dag", "name": "Dag Whitehand", "zone": "scorpion-flats", "role": "lore", "title": "salt prospector", "sprite": {"sheet": "dungeon", "frame": 86, "tint": "#ffffff"}, "lines": ["Salt is white gold. The land sharks agree, sadly.", "If the ground hums, stand still. If it roars, run."]},
    {"id": "scout-kestrel", "name": "Kestrel", "zone": "emberscar-badlands", "role": "lore", "title": "ranger scout", "sprite": {"sheet": "dungeon", "frame": 98, "tint": "#ffb090"}, "lines": ["Gnolls follow the ash. They think the dragon is a god.", "Do not look at the lizard with eight legs. Look at its shadow."]},
-   {"id": "ashwalker-corin", "name": "Corin Ashwalker", "zone": "ashfall-reach", "role": "lore", "title": "cult deserter", "sprite": {"sheet": "dungeon", "frame": 111, "tint": "#c0c0c0"}, "lines": ["I sang with the Choir. Then I saw what we were singing to.", "The gate opens only to the Cinder Key. The High Cantor never lets it go."]},
-   {"id": "watcher-at-the-gate", "name": "The Last Warden", "zone": "the-cindergate", "role": "lore", "title": "ghostly gate warden", "sprite": {"sheet": "dungeon", "frame": 121, "tint": "#a0c0ff"}, "lines": ["We built the gate to hold him in. We held. We hold.", "Fire will not harm him. Bring winter."]},
-   {"id": "drowned-acolyte", "name": "Acolyte Miren", "zone": "drowned-shrine", "role": "lore", "title": "last acolyte of the Moon", "sprite": {"sheet": "dungeon", "frame": 99, "tint": "#b0d0d0"}, "lines": ["The Moon Stone remembers everything spoken before it.", "The Choir asked it one question: where does the Cinder King sleep?"]},
+   {"id": "ashwalker-corin", "name": "Corin Ashwalker", "zone": "ashfall-reach", "role": "lore", "title": "cult deserter", "sprite": {"sheet": "dungeon", "frame": 111, "tint": "#c0c0c0"}, "lines": ["I sang with the Choir. Then I saw what we were singing to.", "The Cantor sings. Someone else writes the song."]},
+   {"id": "watcher-at-the-gate", "name": "The Last Warden", "zone": "the-cindergate", "role": "lore", "title": "ghostly gate warden", "sprite": {"sheet": "dungeon", "frame": 121, "tint": "#a0c0ff"}, "lines": ["We built the gate to hold him in. We held. We hold.", "The song has cracked it. It will fail within days, with you or without you.", "Open it, and you must finish him. Fire will not harm him. Bring winter."]},
+   {"id": "drowned-acolyte", "name": "Acolyte Miren", "zone": "drowned-shrine", "role": "lore", "title": "last acolyte of the Moon", "sprite": {"sheet": "dungeon", "frame": 99, "tint": "#b0d0d0"}, "lines": ["The Moon Stone remembers everything spoken before it.", "The Choir asked it one question: where does the Cinder King sleep?", "Then another came, alone, and asked a second. I heard no breath between the words."]},
    {"id": "statue-seller", "name": "Quiet Tomas", "zone": "serpents-rest", "role": "lore", "title": "a man who whispers", "sprite": {"sheet": "dungeon", "frame": 85, "tint": "#90c090"}, "lines": ["Keep your voice down. She hunts by sound when her eyes are closed.", "A mirror. I would trade my boots for a mirror."]},
-   {"id": "tomb-guide-seti", "name": "Old Seti", "zone": "sepulchre-of-sand", "role": "lore", "title": "tomb guide", "sprite": {"sheet": "dungeon", "frame": 86, "tint": "#f0d090"}, "lines": ["I guided scholars here. Now I guide no one, and I am richer for it.", "The singing below never stops. It is not a happy song."]},
-   {"id": "crater-astrologer", "name": "Mirelle Starwatch", "zone": "fallen-star-crater", "role": "lore", "title": "astrologer", "sprite": {"sheet": "dungeon", "frame": 84, "tint": "#d0b0ff"}, "lines": ["The star that fell here was the twin of the one in the dwarves' pass.", "The Countess invites guests to dinner. Decline."]},
+   {"id": "tomb-guide-seti", "name": "Old Seti", "zone": "sepulchre-of-sand", "role": "lore", "title": "tomb guide", "sprite": {"sheet": "dungeon", "frame": 86, "tint": "#f0d090"}, "lines": ["I guided scholars here. Now I guide no one, and I am richer for it.", "The singing below never stops. It is not a happy song.", "They bow to someone else. Someone who never comes by day."]},
+   {"id": "crater-astrologer", "name": "Mirelle Starwatch", "zone": "fallen-star-crater", "role": "lore", "title": "astrologer", "sprite": {"sheet": "dungeon", "frame": 84, "tint": "#d0b0ff"}, "lines": ["The star that fell here was the twin of the one in the dwarves' pass.", "The Countess keeps her shutters shut by day. She says the ash suits her."]},
    {"id": "drover-finn", "name": "Finn the Drover", "zone": "mistral-downs", "role": "lore", "title": "cattle drover", "sprite": {"sheet": "dungeon", "frame": 85}, "lines": ["Warm wind from the south means rain. From the north-east, ash.", "Orcs raid the downs every autumn. This year they came early."]},
    {"id": "gibbet-jack", "name": "Gibbet Jack", "zone": "gallows-heath", "role": "lore", "title": "repentant bandit", "sprite": {"sheet": "dungeon", "frame": 98, "tint": "#ff9090"}, "lines": ["I rode with the Redcaps till the hooded ones started paying.", "Garrick keeps his ledger in his coat. He trusts nobody. Wise man."]},
    {"id": "wrecker-lass", "name": "Tilly Wrack", "zone": "wreckers-coast", "role": "lore", "title": "beachcomber", "sprite": {"sheet": "dungeon", "frame": 99, "tint": "#c0e0ff"}, "lines": ["Finders keepers. That is the law of the coast.", "A black sloop broke up on the rocks last moon. Its crew wore hoods."]}
@@ -147,6 +148,7 @@
    {"id": "unquenched-blade", "name": "Unquenched Blade", "desc": "Winter's Tooth, reforged but not yet quenched."},
    {"id": "heart-of-rime", "name": "Heart of Rime", "desc": "A shard of ice that never melts, from the white wyrm's lair."},
    {"id": "cinder-key", "name": "Cinder Key", "desc": "A key of black iron, warm as a hearthstone."},
+   {"id": "pale-note", "name": "Pale Note", "desc": "A note in a pale, old-fashioned hand, signed V."},
    {"id": "lighthouse-lens", "name": "Lighthouse Lens", "desc": "The stolen lens of the Gullcry light."},
    {"id": "oldkings-circlet", "name": "Oldking's Circlet", "desc": "A plain iron circlet, very cold."},
    {"id": "venom-sac", "name": "Scorpion Venom Sac", "desc": "Handle with care."},
@@ -164,56 +166,56 @@
     ], "reward": {"xp": 300, "gold": 25, "items": ["thornwood-charm"]}},
    {"id": "the-bells-maker", "chapter": 2, "name": "The Bell's Maker", "giver": "elder-maren", "summary": "The bell bears a founder's mark. Whose?", "steps": [
      {"type": "talk", "npc": "elder-maren", "log": "Ask Elder Maren about the bell.", "pages": ["Look at the mark under the rim: a ring of ash. I have never seen it.", "Take the road north-east to Highmarrow. Loremistress Ilsabet Quill will know it."], "gives": ["gravecallers-bell"]},
-     {"type": "talk", "npc": "ilsabet-quill", "log": "Show the bell to Ilsabet Quill in Highmarrow.", "pages": ["The Ashen Choir. A cult I had hoped was only a story.", "Their gold goes through the Redcap bandits on Gallows Heath, east of here. Bring me Garrick Redcap's ledger."], "takes": ["gravecallers-bell"]},
+     {"type": "talk", "npc": "ilsabet-quill", "log": "Show the bell to Ilsabet Quill in Highmarrow.", "pages": ["The Ashen Choir. A cult I had hoped was only a story.", "Their gold goes through the Redcap bandits on Gallows Heath, east of here. Bring me Garrick Redcap's ledger.", "One of them left the gang: Gibbet Jack. He still camps on the heath, and he talks."], "takes": ["gravecallers-bell"]},
      {"type": "defeat", "monster": "bandit-captain", "as": "Garrick Redcap", "zone": "gallows-heath", "log": "Defeat Garrick Redcap on Gallows Heath.", "gives": ["ashen-ledger"]},
-     {"type": "talk", "npc": "ilsabet-quill", "log": "Bring the ledger to Ilsabet Quill.", "pages": ["Payments, every month, for 'cargo by sea'. Well done."], "takes": ["ashen-ledger"]}
+     {"type": "talk", "npc": "ilsabet-quill", "log": "Bring the ledger to Ilsabet Quill.", "pages": ["Payments every month. Cargo by sea.", "And look at the coin. Pale silver, Thornreach mint. Nobody has struck that in three hundred years."], "takes": ["ashen-ledger"]}
     ], "reward": {"xp": 450, "gold": 60, "items": ["chain-shirt", "potion-of-healing"]}},
    {"id": "salt-and-shadow", "chapter": 3, "name": "Salt and Shadow", "giver": "ilsabet-quill", "summary": "The Choir ships something through Saltmere.", "steps": [
      {"type": "talk", "npc": "ilsabet-quill", "log": "Ask Ilsabet Quill what the ledger says.", "pages": ["The cargo landed at Saltmere, on the west coast. Harbourmaster Dunmore Pell keeps the book.", "Follow the cargo. I want to know what they dug up."]},
-     {"type": "talk", "npc": "dunmore-pell", "log": "Speak to Harbourmaster Dunmore Pell in Saltmere.", "pages": ["A black sloop, hooded crew. She never made port: wrecked a little south, on Wrecker's Coast.", "The hag they call Old Mother Brine takes whatever washes up there."]},
+     {"type": "talk", "npc": "dunmore-pell", "log": "Speak to Harbourmaster Dunmore Pell in Saltmere.", "pages": ["A black sloop, hooded crew. She never made port: wrecked a little south, on Wrecker's Coast.", "That same night the Gullcry lamp went dark. I do not believe in chance.", "The hag they call Old Mother Brine takes whatever washes up there."]},
      {"type": "defeat", "monster": "sea-hag", "as": "Old Mother Brine", "zone": "wreckers-coast", "log": "Defeat Old Mother Brine on Wrecker's Coast."},
      {"type": "fetch", "thing": "sealed-crate", "name": "Sealed crate", "zone": "wreckers-coast", "sprite": "d:89", "log": "Open the Choir's crate in the hag's cave.", "pages": ["Under wet straw lies a seal of black glass. You got the Ashen Sigil."], "gives": ["ashen-sigil"]},
      {"type": "talk", "npc": "ilsabet-quill", "log": "Bring the sigil to Ilsabet Quill.", "pages": ["A moon, scratched out. This was pried from the Moon Shrine in the southern mire."], "takes": ["ashen-sigil"]}
     ], "reward": {"xp": 700, "gold": 120, "items": ["cloak-of-protection", "potion-of-healing"]}},
    {"id": "the-drowned-shrine", "chapter": 4, "name": "The Drowned Shrine", "giver": "ilsabet-quill", "summary": "What did the Choir ask the Moon Stone?", "steps": [
      {"type": "talk", "npc": "ilsabet-quill", "log": "Ask Ilsabet Quill about the Moon Shrine.", "pages": ["The shrine lies drowned in the far south-west. The marsh folk of Willowfen tend it.", "Find their Speaker, Sszath. Be polite. They remember rudeness for generations."]},
-     {"type": "talk", "npc": "speaker-sszath", "log": "Find Speaker Sszath in Willowfen.", "pages": ["The hooded ones left a black wyrmling in the shrine's well. We call it Mirefang.", "Kill it, warm-blood, and the Moon Stone will speak to you."]},
+     {"type": "talk", "npc": "speaker-sszath", "log": "Find Speaker Sszath in Willowfen.", "pages": ["The hooded ones left a black wyrmling in the shrine's well. We call it Mirefang.", "Kill it, warm-blood, and the Moon Stone will speak to you.", "One acolyte still keeps the shrine. Miren heard what the hooded ones asked."]},
      {"type": "defeat", "monster": "black-dragon-wyrmling", "as": "Mirefang", "zone": "drowned-shrine", "log": "Slay Mirefang at the Drowned Shrine."},
-     {"type": "fetch", "thing": "moon-stone", "name": "The Moon Stone", "zone": "drowned-shrine", "sprite": "d:65", "log": "Read the Moon Stone.", "pages": ["Words rise in the stone: 'He sleeps under Cindermaw. The song will wake him.'", "You take a rubbing of the Moon Stone."], "gives": ["moonstone-rubbing"]},
-     {"type": "talk", "npc": "ilsabet-quill", "log": "Bring the rubbing to Ilsabet Quill.", "pages": ["Vharaxis. They mean to wake the Cinder King.", "Fire cannot hurt him. One blade did: Winter's Tooth."], "takes": ["moonstone-rubbing"]}
+     {"type": "fetch", "thing": "moon-stone", "name": "The Moon Stone", "zone": "drowned-shrine", "sprite": "d:65", "log": "Read the Moon Stone.", "pages": ["Words rise in the stone: 'He sleeps under Cindermaw. The song will wake him.'", "Fainter words below, from a second voice with no breath: 'When will the sky go dark?'", "You take a rubbing of the Moon Stone."], "gives": ["moonstone-rubbing"]},
+     {"type": "talk", "npc": "ilsabet-quill", "log": "Bring the rubbing to Ilsabet Quill.", "pages": ["Vharaxis. They mean to wake the Cinder King.", "Fire cannot hurt him. One blade did: Winter's Tooth. And it broke doing it.", "The only weapon that ever bit him lies in pieces. And who asks when the sky goes dark?"], "takes": ["moonstone-rubbing"]}
     ], "reward": {"xp": 1100, "gold": 200, "items": ["ring-of-protection", "potion-of-healing-greater"]}},
    {"id": "the-dwarven-road", "chapter": 5, "name": "The Dwarven Road", "giver": "ilsabet-quill", "summary": "Winter's Tooth must be forged again.", "steps": [
      {"type": "talk", "npc": "ilsabet-quill", "log": "Ask Ilsabet Quill about Winter's Tooth.", "pages": ["The dwarves of Karn Doruhl made it, far to the north. Forgemaster Brakka Ironvein keeps the shards.", "Take my letter, or she will not even open the gate."], "gives": ["letter-of-passage"]},
      {"type": "talk", "npc": "brakka-ironvein", "log": "Bring the letter to Brakka Ironvein in Karn Doruhl.", "pages": ["Quill's hand. Hm. I can forge it again, but not from common iron.", "A star fell in Stonejaw Pass, east of here. Bring me star-iron. Mind the ettin."], "takes": ["letter-of-passage"]},
      {"type": "defeat", "monster": "ettin", "as": "Grum-and-Gorl", "zone": "stonejaw-pass", "log": "Defeat the ettin Grum-and-Gorl in Stonejaw Pass."},
      {"type": "fetch", "thing": "star-iron-vein", "name": "Star-iron vein", "zone": "stonejaw-pass", "sprite": "t:115", "log": "Dig star-iron from the fallen star.", "pages": ["You pry a lump of blue-black metal from the rock. You got a Star-iron Ingot."], "gives": ["star-iron-ingot"]},
-     {"type": "talk", "npc": "brakka-ironvein", "log": "Bring the star-iron to Brakka Ironvein.", "pages": ["Star-iron! I have waited my whole life to work this."], "takes": ["star-iron-ingot"]}
+     {"type": "talk", "npc": "brakka-ironvein", "log": "Bring the star-iron to Brakka Ironvein.", "pages": ["Star-iron! I have waited my whole life to work this.", "Mind, my forge burns red without coal these days. Something under the mountain is breathing."], "takes": ["star-iron-ingot"]}
     ], "reward": {"xp": 1800, "gold": 250, "items": ["breastplate", "potion-of-healing-greater"]}},
    {"id": "winters-tooth", "chapter": 6, "name": "Winter's Tooth", "giver": "brakka-ironvein", "summary": "The blade must be quenched in a wyrm's cold.", "steps": [
      {"type": "talk", "npc": "brakka-ironvein", "log": "Ask Brakka Ironvein about the blade.", "pages": ["The blade is forged, but it is only steel until it is quenched in true cold.", "A white wyrm lairs in the glacier to the west. Sigrun Frostmane hunts on the shore beyond. Ask her."], "gives": ["unquenched-blade"]},
      {"type": "talk", "npc": "sigrun-frostmane", "log": "Find Sigrun Frostmane on Frostfang Shore.", "pages": ["Hoarfang's cave is in the heart of the Rimewater, east of here.", "In his nest lies ice that never melts. That is your quench."]},
      {"type": "defeat", "monster": "young-white-dragon", "as": "Hoarfang", "zone": "rimewater-glacier", "log": "Slay Hoarfang in Rimewater Glacier.", "gives": ["heart-of-rime"]},
-     {"type": "talk", "npc": "brakka-ironvein", "log": "Bring the Heart of Rime to Brakka Ironvein.", "pages": ["Stand back. ... There. Winter's Tooth bites again."], "takes": ["unquenched-blade", "heart-of-rime"]}
+     {"type": "talk", "npc": "brakka-ironvein", "log": "Bring the Heart of Rime to Brakka Ironvein.", "pages": ["Stand back. ... There. Winter's Tooth bites again.", "A smith cannot march. But a smith can arm the one who does. Go."], "takes": ["unquenched-blade", "heart-of-rime"]}
     ], "reward": {"xp": 2300, "gold": 300, "items": ["frost-brand"]}},
-   {"id": "the-ashen-choir", "chapter": 7, "name": "The Ashen Choir", "giver": "ilsabet-quill", "summary": "The Choir holds the key to the mountain.", "steps": [
+   {"id": "the-ashen-choir", "chapter": 7, "name": "The Ashen Choir", "giver": "ilsabet-quill", "summary": "The Choir holds the key to the mountain. Who holds the Choir?", "steps": [
      {"type": "talk", "npc": "ilsabet-quill", "log": "Tell Ilsabet Quill the blade is whole.", "pages": ["Then we strike first. The Choir sings in the Sepulchre of Sand, far to the east.", "My agent Zafira waits at Sunspire Oasis. Go to her."]},
-     {"type": "talk", "npc": "zafira", "log": "Meet Zafira at Sunspire Oasis.", "pages": ["Their High Cantor, Sereth Vane, wears the Cinder Key on a chain.", "The Sepulchre is east of here. Cut the song at its throat."]},
-     {"type": "defeat", "monster": "mage", "as": "High Cantor Sereth Vane", "zone": "sepulchre-of-sand", "log": "Defeat High Cantor Sereth Vane in the Sepulchre of Sand."},
-     {"type": "fetch", "thing": "choir-altar", "name": "The Choir's altar", "zone": "sepulchre-of-sand", "sprite": "d:54", "log": "Take the Cinder Key from the altar.", "pages": ["Among black candles lies a key of warm iron. You got the Cinder Key."], "gives": ["cinder-key"]},
-     {"type": "talk", "npc": "zafira", "log": "Return to Zafira.", "pages": ["You have it! But the song was sung too long. Ash is falling in the north."]}
+     {"type": "talk", "npc": "zafira", "log": "Meet Zafira at Sunspire Oasis.", "pages": ["Their High Cantor, Sereth Vane, wears the Cinder Key on a chain.", "The Sepulchre is east of here. Old Seti sits at its door. He hears more than the Choir thinks."]},
+     {"type": "defeat", "monster": "mage", "as": "High Cantor Sereth Vane", "zone": "sepulchre-of-sand", "log": "Defeat High Cantor Sereth Vane in the Sepulchre of Sand.", "pages": ["Sereth Vane falls, still singing. There is no key on his chain.", "'I was only the voice,' he whispers. 'She wrote the song.'"]},
+     {"type": "fetch", "thing": "choir-altar", "name": "The Choir's altar", "zone": "sepulchre-of-sand", "sprite": "d:54", "log": "Take the Cinder Key from the altar.", "pages": ["Among black candles lies a key of warm iron. Under it, a note in a pale hand.", "'Bring it to me at dusk, Sereth. You are late. - V.'"], "gives": ["cinder-key", "pale-note"]},
+     {"type": "talk", "npc": "zafira", "log": "Bring the key and the note to Zafira.", "pages": ["You have it! And this hand... V. Velda Mournshade. The countess who opened Thornreach's gates.", "So she wrote the song. She does not want a king. She wants his ash: a sky dark enough to walk under.", "Ser Aldric hunts her from the Thornreach Ruins. But the song was sung too long. Ash is falling in the north."], "takes": ["pale-note"]}
     ], "reward": {"xp": 2900, "gold": 400, "items": ["dragon-scale-mail-red", "potion-of-healing-superior"]}},
    {"id": "the-cinder-king", "chapter": 8, "name": "The Cinder King", "giver": "zafira", "summary": "Vharaxis is waking. End it.", "final": true, "steps": [
-     {"type": "talk", "npc": "zafira", "log": "Ask Zafira for the way to the mountain.", "pages": ["North, through the badlands, stands the Cindergate. Beyond it, Mount Cindermaw.", "He is waking. Take the key and Winter's Tooth, and go."]},
-     {"type": "open", "thing": "the-cindergate", "name": "The Cindergate", "zone": "the-cindergate", "sprite": "d:77", "log": "Open the Cindergate with the Cinder Key.", "needs": "cinder-key", "pages": ["The key burns white. The black gate grinds open on a road of ash."]},
+     {"type": "talk", "npc": "zafira", "log": "Ask Zafira for the way to the mountain.", "pages": ["North, through the badlands, stands the Cindergate. Beyond it, Mount Cindermaw.", "He is waking. Take the key and Winter's Tooth. A warden still stands at the gate. Hear him."]},
+     {"type": "open", "thing": "the-cindergate", "name": "The Cindergate", "zone": "the-cindergate", "sprite": "d:77", "log": "Open the Cindergate with the Cinder Key.", "needs": "cinder-key", "pages": ["The key burns white. The black gate grinds open on a road of ash.", "The gate was built to hold him in. Now it stands open. There is no way left but through him."]},
      {"type": "defeat", "monster": "adult-red-dragon", "as": "Vharaxis, the Cinder King", "zone": "mount-cindermaw", "log": "Slay Vharaxis, the Cinder King, on Mount Cindermaw.", "pages": ["WHO WAKES THE CINDER KING? ... A blade of winter. I remember that sting."]},
-     {"type": "talk", "npc": "elder-maren", "log": "Go home to Brindlemere and tell Elder Maren.", "pages": ["The red wyrm is dead? Then my grandmother can rest, and so can Aldermoor.", "Brindlemere will sing of you for three hundred years more."]}
+     {"type": "talk", "npc": "elder-maren", "log": "Go home to Brindlemere and tell Elder Maren.", "pages": ["Look up. The ash has stopped. The sky is blue.", "Tobin hung the old bell in the chapel. Tonight it rings for the living.", "Brindlemere will sing of you for three hundred years more."]}
     ], "reward": {"xp": 5000, "gold": 5000, "items": ["potion-of-healing-supreme"]}}
   ],
   "side": [
    {"id": "cellar-rats", "name": "Rats in the Kettle", "giver": "pella-thrushcombe", "steps": [
      {"type": "talk", "npc": "pella-thrushcombe", "log": "Talk to Pella at the Brass Kettle.", "pages": ["Something the size of a dog is in my cellar. It ate a ham. A whole ham!"]},
      {"type": "defeat", "monster": "giant-rat", "as": "the Ham Thief", "zone": "brindlemere", "log": "Kill the giant rat by the inn."},
-     {"type": "talk", "npc": "pella-thrushcombe", "log": "Tell Pella the cellar is safe.", "pages": ["Bless you. Supper is on the house, and take this for the road."]}
+     {"type": "talk", "npc": "pella-thrushcombe", "log": "Tell Pella the cellar is safe.", "pages": ["Bless you. Supper is on the house, and take this for the road.", "Odd thing: it nested in a crate that is not mine. Stamped with a ring of ash."]}
     ], "reward": {"xp": 50, "gold": 10, "items": ["potion-of-healing"]}},
    {"id": "the-missing-shepherd", "name": "The Missing Shepherd", "giver": "tam-oatley", "steps": [
      {"type": "talk", "npc": "tam-oatley", "log": "Talk to Tam Oatley in Larkspur Fields.", "pages": ["My shepherd went to the east field and the field ate him. Burrows everywhere."]},
@@ -221,23 +223,23 @@
      {"type": "talk", "npc": "tam-oatley", "log": "Tell Tam Oatley.", "pages": ["So that is what an ankheg looks like. My old bow is yours."]}
     ], "reward": {"xp": 200, "gold": 30, "items": ["shortbow-plus-1"]}},
    {"id": "greymaw", "name": "Greymaw", "giver": "greta-fenn", "steps": [
-     {"type": "talk", "npc": "greta-fenn", "log": "Talk to Greta Fenn in Pinewatch.", "pages": ["Greymaw leads the pack to the farms now. I cannot take him alone."]},
+     {"type": "talk", "npc": "greta-fenn", "log": "Talk to Greta Fenn in Pinewatch.", "pages": ["Greymaw leads the pack to the farms now. I cannot take him alone.", "They came south in a hurry. Wolves do that when the north smells of smoke."]},
      {"type": "defeat", "monster": "dire-wolf", "as": "Greymaw", "zone": "pinewatch", "log": "Hunt Greymaw in Pinewatch."},
-     {"type": "talk", "npc": "greta-fenn", "log": "Return to Greta Fenn.", "pages": ["The pack will scatter. Here, I stitched this from better days."]}
+     {"type": "talk", "npc": "greta-fenn", "log": "Return to Greta Fenn.", "pages": ["The pack will scatter. Here, I stitched this from better days.", "If you pass Brindlemere, tell my sister Mabel I still owe her a letter."]}
     ], "reward": {"xp": 200, "gold": 40, "items": ["studded-leather-armor"]}},
    {"id": "the-dark-lighthouse", "name": "The Dark Lighthouse", "giver": "old-corwin", "steps": [
-     {"type": "talk", "npc": "old-corwin", "log": "Talk to Old Corwin on Gullcry Cliffs.", "pages": ["Harpies took my lens for their nest. Shiny, you see. Ships are dying for it."]},
+     {"type": "talk", "npc": "old-corwin", "log": "Talk to Old Corwin on Gullcry Cliffs.", "pages": ["Harpies took my lens for their nest. Shiny, you see. Ships are dying for it.", "The lamp went dark the very night a black sloop came up the coast."]},
      {"type": "defeat", "monster": "harpy", "as": "the Nest Mother", "zone": "gullcry-cliffs", "log": "Defeat the harpy on the cliff."},
      {"type": "fetch", "thing": "harpy-nest", "name": "Harpy nest", "zone": "gullcry-cliffs", "sprite": "t:94", "log": "Take the lens from the nest.", "pages": ["Among bones and feathers: the Lighthouse Lens."], "gives": ["lighthouse-lens"]},
-     {"type": "talk", "npc": "old-corwin", "log": "Bring the lens to Old Corwin.", "pages": ["She shines! Saltmere will see her tonight."], "takes": ["lighthouse-lens"]}
+     {"type": "talk", "npc": "old-corwin", "log": "Bring the lens to Old Corwin.", "pages": ["She shines! Saltmere will see her tonight.", "No hooded ship lands unseen on this coast again."], "takes": ["lighthouse-lens"]}
     ], "reward": {"xp": 300, "gold": 60, "items": ["potion-of-heroism"]}},
    {"id": "goblin-toll", "name": "The Goblin Toll", "giver": "bram-tolliver", "steps": [
      {"type": "talk", "npc": "bram-tolliver", "log": "Talk to Bram Tolliver in Highmarrow.", "pages": ["Chief Krug holds the hill road north of here. A bugbear. Make him let go of it."]},
      {"type": "defeat", "monster": "bugbear", "as": "Chief Krug", "zone": "hollowhorn-hills", "log": "Defeat Chief Krug in the Hollowhorn Hills."},
-     {"type": "talk", "npc": "bram-tolliver", "log": "Return to Bram Tolliver.", "pages": ["The road is open! Take a shield from my stock, and my thanks."]}
+     {"type": "talk", "npc": "bram-tolliver", "log": "Return to Bram Tolliver.", "pages": ["The road is open! Take a shield from my stock, and my thanks.", "Krug's purse was full of pale silver. Who pays a bugbear to shut the dwarves' road?"]}
     ], "reward": {"xp": 300, "gold": 80, "items": ["shield"]}},
    {"id": "the-barrow-king", "name": "The Barrow King", "giver": "sister-averil", "steps": [
-     {"type": "talk", "npc": "sister-averil", "log": "Talk to Sister Averil at the Oldking Barrows.", "pages": ["The seventh king walks. Lay him down, and bring me his circlet to bless."]},
+     {"type": "talk", "npc": "sister-averil", "log": "Talk to Sister Averil at the Oldking Barrows.", "pages": ["The seventh king walks. He rose the night a bell first rang under Thornwood.", "Lay him down, and bring me his circlet to bless."]},
      {"type": "defeat", "monster": "wight", "as": "the Barrow King", "zone": "oldking-barrows", "log": "Defeat the Barrow King."},
      {"type": "fetch", "thing": "barrow-mound", "name": "The seventh mound", "zone": "oldking-barrows", "sprite": "d:64", "log": "Take the circlet from the mound.", "pages": ["Cold iron in cold earth. You got the Oldking's Circlet."], "gives": ["oldkings-circlet"]},
      {"type": "talk", "npc": "sister-averil", "log": "Bring the circlet to Sister Averil.", "pages": ["Now I can pray over seven. This mace was made for work like yours."], "takes": ["oldkings-circlet"]}
@@ -245,7 +247,7 @@
    {"id": "scorpion-venom", "name": "A Drop of Venom", "giver": "hakim-nour", "steps": [
      {"type": "talk", "npc": "hakim-nour", "log": "Talk to Hakim Nour at Sunspire Oasis.", "pages": ["I need venom from a great scorpion of the salt flats, south-east. Fresh."]},
      {"type": "defeat", "monster": "giant-scorpion", "as": "the Salt Stalker", "zone": "scorpion-flats", "log": "Kill a giant scorpion on Scorpion Flats.", "gives": ["venom-sac"]},
-     {"type": "talk", "npc": "hakim-nour", "log": "Bring the venom sac to Hakim Nour.", "pages": ["Perfect. Two of these will become twenty cures. These are for you."], "takes": ["venom-sac"]}
+     {"type": "talk", "npc": "hakim-nour", "log": "Bring the venom sac to Hakim Nour.", "pages": ["Perfect. Two of these will become twenty cures. These are for you.", "Choir pilgrims buy my cures and walk east. They never come back."], "takes": ["venom-sac"]}
     ], "reward": {"xp": 700, "gold": 120, "items": ["potion-of-healing-greater", "antitoxin-vial"]}},
    {"id": "the-stone-garden", "name": "The Stone Garden", "giver": "lysander-brock", "steps": [
      {"type": "talk", "npc": "lysander-brock", "log": "Talk to Professor Brock in the Emerald Deep.", "pages": ["My whole expedition stands in that temple to the east. As statues. Avenge them, would you?"]},
@@ -264,14 +266,14 @@
      {"type": "talk", "npc": "nessa-quickfingers", "log": "Return to Nessa Quickfingers.", "pages": ["You keep the sword. I am keeping my distance from pyramids."], "takes": ["canopic-jar"]}
     ], "reward": {"xp": 5000, "gold": 800, "items": ["sun-blade"]}},
    {"id": "giants-ransom", "name": "The Giant's Ransom", "giver": "durgan-kettlehelm", "steps": [
-     {"type": "talk", "npc": "durgan-kettlehelm", "log": "Talk to Durgan Kettlehelm in Karn Doruhl.", "pages": ["Jarl Skaldi holds my brother's patrol on the glacier, west. We do not pay giants."]},
+     {"type": "talk", "npc": "durgan-kettlehelm", "log": "Talk to Durgan Kettlehelm in Karn Doruhl.", "pages": ["Jarl Skaldi holds my brother's patrol on the glacier, west. We do not pay giants.", "The giants raid because a white wyrm drove them off the high ice."]},
      {"type": "defeat", "monster": "frost-giant", "as": "Jarl Skaldi", "zone": "rimewater-glacier", "log": "Defeat Jarl Skaldi on Rimewater Glacier."},
      {"type": "talk", "npc": "durgan-kettlehelm", "log": "Return to Durgan Kettlehelm.", "pages": ["They are home. This plate was my brother's gift to whoever freed him."]}
     ], "reward": {"xp": 3900, "gold": 500, "items": ["dwarven-plate"]}},
    {"id": "the-pale-lady", "name": "The Pale Lady", "giver": "ser-aldric-thorne", "steps": [
-     {"type": "talk", "npc": "ser-aldric-thorne", "log": "Talk to Ser Aldric Thorne in the Thornreach Ruins.", "pages": ["Countess Velda Mournshade opened our gates to the fire. She holds court in the crater, far south-east."]},
-     {"type": "defeat", "monster": "vampire", "as": "Countess Velda Mournshade", "zone": "fallen-star-crater", "log": "Destroy Countess Mournshade in the Fallen Star Crater."},
-     {"type": "talk", "npc": "ser-aldric-thorne", "log": "Return to Ser Aldric Thorne.", "pages": ["Thornreach is avenged. My order's last treasures are yours."]}
+     {"type": "talk", "npc": "ser-aldric-thorne", "log": "Talk to Ser Aldric Thorne in the Thornreach Ruins.", "pages": ["Countess Velda Mournshade smiled at our king and opened our gates to the fire.", "Three hundred years, and she still wants the sky dark. She holds court in the crater, far south-east."]},
+     {"type": "defeat", "monster": "vampire-spawn", "as": "Countess Velda Mournshade", "zone": "fallen-star-crater", "log": "Destroy Countess Mournshade in the Fallen Star Crater.", "pages": ["'Such a long walk in the sun, little hero. One more song and I would never hide again.'", "The Countess falls to ash. The shutters of her manor bang open in the wind."]},
+     {"type": "talk", "npc": "ser-aldric-thorne", "log": "Return to Ser Aldric Thorne.", "pages": ["Thornreach is avenged. My order's last treasures are yours.", "Three hundred years I kept this watch. Tonight I will sleep."]}
     ], "reward": {"xp": 10000, "gold": 1000, "items": ["belt-of-giant-strength-hill", "potion-of-healing-supreme"]}}
   ]
  }
