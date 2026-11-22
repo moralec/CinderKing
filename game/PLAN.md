@@ -1,0 +1,41 @@
+# Round 4 in chunks: Aldermoor on your round 3 build
+
+- [x] 01 js/db.js: load the data, then start the game
+- [x] 02 js/lists.js: the hook shows the data: bestiary, catalog, credits
+- [x] 03 js/hero.js: gold, equipment, armour class and attack by the rules
+- [x] 04 js/gear.js: carry, wear and wield: addItem, addGold, equip, unequip
+- [x] 05 js/potion.js: potions of the data heal and are used up
+- [x] 06 js/herolink.js: the old rules follow the new numbers
+- [x] 07 js/fight.js: every battle fields a monster of the data
+- [x] 08 js/swing.js: one press of A: d20 against armour class, both sides
+- [x] 09 js/fightaids.js: grass -> battle -> win -> XP -> level; test aids
+- [x] 10 js/zoneplan.js: the layout of a generated zone: roles, exits, slots
+- [x] 11 js/zonegen.js: makeZone: a map object like the hand-made ones
+- [x] 12 js/realm.js: the 36 zones become maps; window.__game.world and .maps
+- [x] 13 js/zonescene.js: ONE scene class draws every generated zone
+- [x] 14 js/travel.js: the test aid travel(map, x, y)
+- [x] 15 js/visited.js: visited zones
+- [x] 16 js/look.js: biome -> look: every kind of land has its colour
+- [x] 17 js/exits.js: zone edges -> on foot from zone to zone
+- [x] 18 js/folk.js: the 52 people stand in their zones
+- [x] 19 js/folktalk.js: A facing a person -> the lines of the data
+- [x] 20 js/tales.js: quest state: stage, status, current step
+- [x] 21 js/questspots.js: where every quest step is pressed; things and foes
+- [x] 22 js/questfinish.js: quest step -> reward: Tales.finish
+- [x] 23 js/questtalk.js: talk -> quest
+- [x] 24 js/questpress.js: fetch, open, defeat: A facing a quest thing or foe
+- [x] 25 js/ending.js: the ending card; long pages are cut to fit the dialogue box
+- [x] 26 js/elder.js: the campaign runs: chapter 1 into chapter 2, and the last talk
+- [x] 27 js/shop.js: a shop: stock, buy, sell
+- [x] 28 js/shopview.js: the shop panel, the cursor, A buys
+- [x] 29 js/shopdoor.js: talk to a merchant -> shop -> buy -> wear it; B leaves
+- [x] 30 js/keep.js: save and load keep everything
+- [x] 31 js/pages.js: Start menu: Map and Credits entries, the Quest page
+- [x] 32 js/mapview.js: the Map page: the grid of zones
+- [x] 33 js/tints.js: the colours of people, quest things and foes
+- [x] 34 PLAN.md: the plan, and a clean build
+- [x] 35 js/shopview.js: dialogue shows all pages, not just the first
+- [x] 36 js/battleview.js: sprite and foe name fit inside their boxes
+- [x] 37 js/battleview.js: d20/d8 labels below log, action bar not cut
+- [x] 38 js/shopview.js: prices fit at right edge, hint line always shows
+- [x] 39 PLAN.md: all 38 tests pass, round 4 complete
