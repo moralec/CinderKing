@@ -42,5 +42,5 @@ party before the claim is made.
 ## Open items before the claim
 - world.json (zones, people, campaign skeleton) was written by Fable: replace or rewrite its text locally in the story round, or
   state it in the claim as given data like the SRD.
-- Rounds 1-3 code is local but its plans and one review were cloud: state it, or treat rounds 1-3 as the starting kit.
+- Rounds 1-3 code is local but its plans and reviews were cloud: **decided (author, 22 Nov): keep it as the starting kit and say so; no redo from scratch.**
 - Cover and back-cover text are cloud: credit, or redo locally.
