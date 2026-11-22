@@ -13,7 +13,7 @@ const END = '/^\\s*THE END\\s*$/';
 
 export default function (suite, ctx) {
   const D = ctx.data, W = D.world, main = W.quests.main, side = W.quests.side;
-  const S = (ctx.shared.story = { done: {}, paid: [], pages: [], unfit: [], bosses: [], ending: null, sidesOpen: false });
+  const S = (ctx.shared.story = { done: {}, paid: [], pages: [], unfit: [], bosses: [], starts: [], ending: null, sidesOpen: false });
   // every text a writer wrote as one page: a shown page shorter than 3 words must be one of these
   const authored = new Set();
   for (const n of W.npcs) for (const l of n.lines || []) { authored.add(l.trim()); authored.add(`${n.name}: ${l}`.trim()); }
@@ -51,6 +51,7 @@ export default function (suite, ctx) {
     t.must(v2.stage === k + 1, `${where}: the stage is ${v2.stage}, wanted ${k + 1}; it said ${JSON.stringify(said[0] || '(nothing)')}`);
     for (const id of step.gives || []) t.must(count(a.inv, D.nameOf(id)) > count(b.inv, D.nameOf(id)) || (q.reward.items || []).includes(id), `${where}: it should give ${D.nameOf(id)}, which is not in the bag`);
     for (const id of [...(step.takes || []), ...(step.needs ? [step.needs] : [])]) t.must(count(a.inv, D.nameOf(id)) < count(b.inv, D.nameOf(id)) || (step.gives || []).includes(id), `${where}: it should take ${D.nameOf(id)}, which is still in the bag`);
+    if (k === 0) S.starts.push({ quest: q.id, name: q.name, pages: said });
     if (step.type === 'defeat') S.bosses.push({ quest: q.id, kind: q.kind, chapter: q.chapter || null, as: step.as, level, xp: b.xp, ac: b.ac, rounds, pre, intro: step.intro || null });
     if (k === q.steps.length - 1) {
       t.must(v2.status === 'done', `${q.id}: every step is done but the status is ${v2.status}`);
@@ -131,6 +132,13 @@ export default function (suite, ctx) {
       if (p.items.length) bad.push(`${p.quest} did not give ${p.items.map(D.nameOf).join(', ')}`); }
     t.must(!bad.length, bad.slice(0, 4).join('; '));
     return `${S.paid.length} quests`;
+  }, { browser: false });
+
+  suite.test('story.quest.added', 'every quest says so when it begins: a "quest added" page with the quest\'s name on its first step', (t) => {
+    t.must(S.starts.length > 0, 'no quest was begun in this run (run the story tests with it)');
+    const miss = S.starts.filter((x) => !x.pages.some((p) => /quest (added|begun|started)|new quest/i.test(p)) || !squash(x.pages.join(' ')).includes(squash(x.name))).map((x) => x.name);
+    t.must(!miss.length, `${miss.length} of ${S.starts.length} quests begin without a "quest added" message that names them: ${miss.slice(0, 5).join(', ')}`);
+    return `${S.starts.length} quests`;
   }, { browser: false });
 
   suite.test('story.boss.intro', 'bosses speak BEFORE the fight: the last boss has `intro` pages in the data, and every `intro` is shown before the first blow', (t) => {

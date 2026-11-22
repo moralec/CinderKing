@@ -5,6 +5,7 @@
 // the row under the cursor starts with '>' (as the Start menu and the shop already do), ArrowUp/ArrowDown move it.
 import { KEY, sleep } from './lib/harness.mjs';
 import { offersRest, isSettlement } from './data.mjs';
+import { helpers } from './lib/gate.mjs';
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const row = (name) => new RegExp(esc(name.slice(0, 10)), 'i');          // a row may cut a long name: its first 10 letters
@@ -222,7 +223,7 @@ export default function (suite, { data: D }) {
   });
 
   // ---------------------------------------------------------------- rest
-  suite.test('ui.rest.inn', 'rest: talking to an innkeeper (A through the talk) restores all HP, for a fee the hero can pay', async (t) => {
+  suite.test('ui.rest.inn', 'rest: talking to an innkeeper (A through the talk) restores all HP, for a fee in gold the hero can pay', async (t) => {
     const inn = W.npcs.find((n) => n.zone === startZone && offersRest(n)) || W.npcs.find((n) => offersRest(n) && isSettlement(W.zones.find((z) => z.id === n.zone)));
     t.must(inn, 'no person of the data offers a rest (a `rest` field, or an innkeeper by title)');
     await t.play(); await setup(t, 'a.addGold(50); a.setEncounters(false)'); await t.ev('TA.setHp(1)');
@@ -231,16 +232,28 @@ export default function (suite, { data: D }) {
     for (let i = 0; i < 3 && (await t.state()).hp < (await t.state()).maxHp; i++) { await press(t, at); said = await t.readAll(); await setup(t, 'T.shut()'); }
     const st = await t.state();
     t.must(st.hp === st.maxHp, `after talking to ${inn.name} three times the hero has ${st.hp}/${st.maxHp} HP; the last talk: ${JSON.stringify(said.join(' ').slice(0, 110))}`);
-    t.must(st.gold <= g0 && st.gold >= 0, `gold ${g0} -> ${st.gold}`);
+    t.must(st.gold < g0 && st.gold >= 0, `the inn took no gold (${g0} -> ${st.gold}): a night at an inn costs a fee, the bed at home is the free rest`);
     return `${inn.name}, fee ${g0 - st.gold} gp`;
   });
 
-  suite.test('ui.rest.bed', 'rest: the bed in the hero\'s house (window.__game.landmarks.bed) restores all HP', async (t) => {
-    await t.play(); await t.ev('TA.setHp(1)');
+  suite.test('ui.rest.bed', 'rest: a bed in the start town (window.__game.landmarks.bed, e.g. in the hero\'s house) can be walked to from the start without a fight; A on it restores all HP for free and says so', async (t) => {
+    await t.play();
     const bed = await hook(t, 'landmarks.bed');
     t.must(bed && bed.map != null, 'window.__game.landmarks.bed is missing: there is no bed to rest in');
-    await press(t, bed); await t.readAll();
-    const st = await t.state(); t.must(st.hp === st.maxHp, `after A on the bed: ${st.hp}/${st.maxHp} HP`);
+    const zones = await hook(t, 'world.zones'), town = zones.find((z) => z.id === startZone).map, home = (W.sites || []).filter((x) => x.zone === startZone).map((x) => x.id);
+    t.must(bed.map === town || home.includes(bed.map), `the bed is on ${bed.map}, not in the start town (${town}) or a house of it (${home.join(', ')})`);
+    // on foot from the start tile, random fights on: no battle on the way
+    const H = helpers(t);
+    if (bed.map !== town) { const door = await hook(t, 'landmarks.door'); await H.walkTo(door.x, door.y); await sleep(400); await t.ev('T.idle()'); }
+    const w = await H.walkTo(bed.x, bed.y, true), on = await t.state();
+    t.must(!on.battle && on.result == null, 'a fight started on the way from the start to the bed');
+    t.must(w.ok && on.map === bed.map, `the bed cannot be walked to from the start: ${w.why || 'the hero is on ' + on.map}`);
+    await t.ev('TA.setHp(1)'); const g0 = on.gold;
+    await press(t, bed); const said = await t.readAll();
+    const st = await t.state();
+    t.must(st.hp === st.maxHp, `after A on the bed: ${st.hp}/${st.maxHp} HP`);
+    t.must(st.gold === g0, `the bed cost ${g0 - st.gold} gp: it must be free`);
+    t.must(said.some((p) => /rest|sleep|slept|bed/i.test(p)), `A on the bed says nothing about resting (${JSON.stringify(said[0] || '')})`);
   });
 
   // ---------------------------------------------------------------- battle
@@ -329,6 +342,199 @@ export default function (suite, { data: D }) {
     t.must(ok, `the battle screen shows neither ${JSON.stringify(st.as)}${st.short ? ' nor ' + JSON.stringify(st.short) : ' (the step has no `short` name)'}; it shows ${JSON.stringify(view.split('\n').filter((l) => l.includes(st.as.slice(0, 5))))}`);
     t.must(!bad.length, bad.join(' | '));
   }, { timeout: 180000 });
+
+  // ---------------------------------------------------------------- the author's notes on v0.6 (feedback/round4-author.md)
+  const VIEWBOX = [0, 0, 256, 144], dark = (c) => c[0] < 48 && c[1] < 48 && c[2] < 48;
+  const viewText = async (t) => (await t.texts()).filter((x) => x.y < 144).map((x) => x.text).join('\n');
+
+  suite.test('ui.title.animated', 'title: something moves on the title screen (two pictures 0.5 s apart differ)', async (t) => {
+    await t.open(); t.must(await t.ev('T.onTitle()'), 'a fresh page shows no title');
+    let most = 0; for (let i = 0; i < 4; i++) most = Math.max(most, await t.motion(VIEWBOX, 500));
+    t.must(most >= 0.0005, `the title is a still picture: ${(100 * most).toFixed(2)} % of its pixels change in half a second (wanted at least 0.05 %)`);
+    return `${(100 * most).toFixed(2)} % of the pixels move`;
+  });
+
+  suite.test('ui.title.nostatus', 'title: the status bar (HP, level, gold, the place) is not drawn on the title screen', async (t) => {
+    await t.open(); t.must(await t.ev('T.onTitle()'), 'a fresh page shows no title');
+    const bar = (await strip(t)).filter((s) => /HP\s*\d|Lv\.?\s*\d|\d\s*gp\b|START:/i.test(s) || W.zones.some((z) => z.name === s.trim()));
+    t.must(!bar.length, `the title shows the status bar: ${bar.join(' | ')}`);
+  });
+
+  suite.test('ui.intro', 'a new game opens with the story: after START the introduction (meta.story of the data) is told before the hero can move', async (t) => {
+    await t.open(); await t.pastTitle();
+    let told = ''; for (let i = 0; i < 60; i++) { const st = await t.state(); told += ' ' + (await viewText(t)); if (!st.dialogue && st.idle && i > 0) break; await t.A(120); }
+    const sq = (x) => String(x).toLowerCase().replace(/[^a-z0-9]/g, ''), miss = W.meta.story.filter((line) => !sq(told).includes(sq(line).slice(0, 40)));
+    t.must(miss.length < W.meta.story.length, `after START the game is on the map at once: none of the ${W.meta.story.length} sentences of the story's introduction is shown (the first: ${JSON.stringify(W.meta.story[0].slice(0, 60))})`);
+    t.must(!miss.length, `${miss.length} of the ${W.meta.story.length} sentences of the introduction are not shown`);
+    const st = await t.state(); t.must(st.idle && !st.dialogue, 'after the introduction the game does not take input');
+  });
+
+  suite.test('ui.shop.scroll', 'shop: every ware of every merchant comes under the cursor with ArrowDown, one row a tap; the list shows that it goes on; the last ware can be bought', async (t) => {
+    await t.play(); await setup(t, 'a.addGold(20000); a.setEncounters(false)');
+    const bad = [];
+    for (const m of W.npcs.filter((n) => n.role === 'merchant')) { await openShop(t, m.id);
+      for (let i = 0; i < m.stock.length; i++) { const it = D.item[m.stock[i]], mk = await t.ev('T.marked()');
+        if (!mk.some((l) => row(it.name).test(l))) { bad.push(`${m.name}: after ${i} taps of ArrowDown the cursor is on ${JSON.stringify(mk[0] || '')}, not on ${it.name}`); break; }
+        const rows = (await t.lines()).filter((l) => m.stock.some((id) => row(D.item[id].name).test(l))).length, more = await t.ev('T.sees(/[▼▲↓↑…]|\\bmore\\b|\\d+\\s*\\/\\s*\\d+/i)');
+        if (m.stock.length > 5 && rows < 5 && !more) { bad.push(`${m.name}: with the cursor on ware ${i + 1} of ${m.stock.length} only ${rows} wares are drawn and nothing says the list goes on`); break; }
+        if (i < m.stock.length - 1) await t.key(KEY.down, 30, 240); }
+      const last = D.item[m.stock[m.stock.length - 1]], g0 = (await t.state()).gold;
+      await t.A(200); if ((await t.state()).gold === g0) { await t.readAll(); await t.A(200); } await t.readAll();
+      if (!bad.length && Math.abs(g0 - (await t.state()).gold - last.cost_gp) > 0.01) bad.push(`${m.name}: the last ware (${last.name}) could not be bought`);
+      await setup(t, 'T.shut()'); }
+    t.must(!bad.length, bad.slice(0, 3).join(' | '));
+  }, { timeout: 240000 });
+
+  suite.test('ui.battle.nobox', 'battle: the foe is drawn on the battle ground, not on a black box (under a quarter of the area around it is near-black)', async (t) => {
+    await t.play(); const bad = [];
+    for (const m of [weak, strong, D.mon[W.quests.main[0].steps.find((s) => s.type === 'defeat').monster]]) {
+      await fight(t, m.id, 2); const all = (await t.ev('T.sprites()')).filter((x) => x.scene === 'UI' && x.y < 144 && x.scale >= 2), foe = all.sort((a, b) => b.w * b.h - a.w * a.h)[0];
+      t.must(foe, 'no foe picture is drawn in the battle');
+      const sh = await t.share([Math.max(0, foe.x - 4), Math.max(0, foe.y - 2), Math.min(foe.w + 8, 256 - foe.x), foe.h + 4], dark);
+      if (sh >= 0.25) bad.push(`${m.name}: ${Math.round(100 * sh)} % of the area around the foe is near-black`);
+      await setup(t, 'T.shut()'); await t.ev('T.idle()'); }
+    t.must(!bad.length, bad.join(' | ') + ': the foe stands on a dark box');
+  });
+
+  suite.test('ui.map.foes', 'map: every quest foe standing on a map is drawn with its picture of data/sprites.json (the same one the battle shows)', async (t) => {
+    await t.play(); await setup(t, 'a.setEncounters(false)'); const bad = []; let n = 0;
+    for (const q of D.quests) for (let k = 0; k < q.steps.length; k++) { const st = q.steps[k]; if (st.type !== 'defeat') continue;
+      const want = (D.sprites.monsters || {})[st.monster]; if (!want) continue;
+      const at = await t.ev(`T.quest('${q.kind}', ${q.index}).steps[${k}].at`); await t.ev(`T.go(${JSON.stringify(at.map)})`); await sleep(60);
+      const got = (await t.ev('T.sprites()')).filter((x) => x.scene !== 'UI' && Math.abs(x.cx - (at.x * 16 + 8)) < 1 && Math.abs(x.cy - (at.y * 16 + 8)) < 1).sort((a, b) => b.depth - a.depth)[0];
+      n++; if (!got) bad.push(`${st.as}: nothing is drawn on its tile`); else if (got.key !== want[0] || String(got.frame) !== String(want[1])) bad.push(`${st.as} (${st.monster}) is drawn with ${got.key} ${got.frame}, sprites.json says ${want[0]} ${want[1]}`); }
+    t.must(!bad.length, `${bad.length} of ${n} quest foes have the wrong picture on the map: ${bad.slice(0, 3).join('; ')}`);
+    return `${n} foes`;
+  }, { timeout: 180000 });
+
+  suite.test('ui.items.sections', 'Items: what is worn and what is in the bag are two labelled groups', async (t) => {
+    await t.play(); await fill(t); await t.menu('Items'); await t.A(200); await setup(t, 'if (g.dialogueOpen) a.pressA()');
+    const all = (await t.lines()).join('\n');
+    t.must(/\b(worn|wearing|equipped|equipment)\b/i.test(all) && /\b(bag|pack|carried|carrying)\b/i.test(all), `the Items page has no heading for worn gear and one for the bag (it shows: ${JSON.stringify(all.split('\n').filter((l) => !/^\s*>?\s*(Party|Items|Quest|Map|Credits|Save|Load|Close)$/.test(l)).slice(-6))})`);
+  });
+
+  suite.test('ui.items.hint', 'Items: the row under the cursor says in words what A will do (drink, wear or wield, take off)', async (t) => {
+    await t.play(); await fill(t); await setup(t, `a.equip('shield')`);
+    await itemsList(t, [...bagNames, D.item.shield.name]);
+    const says = async (name, re) => { t.must(await t.cursorTo(row(name), { max: 24 }), `the cursor never reaches "${name}"`); const all = (await t.lines()).join('\n'); t.must(re.test(all), `with the cursor on "${name}" nothing on the page says what A does (wanted ${re})`); };
+    await says(D.item['potion-of-healing'].name, /\b(drink|use)\b/i);
+    await says(D.item['chain-shirt'].name, /\b(wear|equip|put on)\b/i);
+    await says(D.item.shield.name, /\b(take off|remove|unequip)\b/i);
+  });
+
+  suite.test('ui.items.compare', 'Items: a piece of gear under the cursor shows what it changes (armour class or damage: now and with it, better or worse); a thing with no use says so', async (t) => {
+    await t.play(); await fill(t);
+    const h = await t.ev('T.hero()'), neu = D.item['chain-shirt'], ac1 = await t.ev(`(() => { const a = window.__game.actions; a.equip('chain-shirt'); const v = T.hero().ac; a.equip(${JSON.stringify(h.equipment.armor)}); return v; })()`);
+    await itemsList(t, bagNames);
+    t.must(await t.cursorTo(row(neu.name), { max: 24 }), `the cursor never reaches "${neu.name}"`);
+    let all = await viewText(t);
+    t.must(new RegExp(`\\b${h.ac}\\b[\\s\\S]{0,16}\\b${ac1}\\b`).test(all), `with the cursor on "${neu.name}" the page does not show the armour class now and with it (${h.ac} and ${ac1})`);
+    t.must(/better|worse|▲|▼|\+\d/i.test(all), 'nothing marks the change as better or worse');
+    t.must(await t.cursorTo(row(D.item.dagger.name), { max: 24 }), 'the cursor never reaches the dagger'); all = await viewText(t);
+    t.must(all.includes(D.item[h.equipment.weapon].damage) && all.includes(D.item.dagger.damage), `with the cursor on the dagger the page does not show the damage now (${D.item[h.equipment.weapon].damage}) and with it (${D.item.dagger.damage})`);
+    t.must(await t.cursorTo(row(D.item.torch.name), { max: 24 }), 'the cursor never reaches the torch'); all = await viewText(t);
+    t.must(/can(no|')t|no use|not usable|nothing to do/i.test(all), 'a thing that cannot be used (a torch) does not say so');
+  });
+
+  suite.test('ui.shop.compare', 'shop: the ware under the cursor shows what it would change for the hero (armour class or damage: now and with it, better or worse)', async (t) => {
+    await t.play(); await setup(t, 'a.addGold(500); a.setEncounters(false)');
+    const m = W.npcs.find((n) => n.role === 'merchant' && n.stock.includes('chain-shirt') && n.stock.some((id) => D.item[id].kind === 'weapon')) || merchant;
+    const arm = D.item[m.stock.find((id) => D.item[id].kind === 'armor')], wep = D.item[m.stock.find((id) => D.item[id].kind === 'weapon' && D.item[id].damage !== D.item[W.meta.start.equipment.weapon].damage)];
+    const h = await t.ev('T.hero()'), ac1 = await t.ev(`(() => { const a = window.__game.actions; a.addItem(${JSON.stringify(arm.id)}); a.equip(${JSON.stringify(arm.id)}); const v = T.hero().ac; a.equip(${JSON.stringify(h.equipment.armor)}); return v; })()`);
+    await openShop(t, m.id);
+    t.must(await t.cursorTo(row(arm.name), { max: m.stock.length + 2 }), `the cursor never reaches "${arm.name}"`);
+    let all = await viewText(t);
+    t.must(new RegExp(`\\b${h.ac}\\b[\\s\\S]{0,16}\\b${ac1}\\b`).test(all), `with the cursor on "${arm.name}" the shop does not show the hero's armour class now and with it (${h.ac} and ${ac1}); it shows only the name and the price`);
+    t.must(/better|worse|same|▲|▼|\+\d/i.test(all), 'nothing marks the change as better or worse');
+    t.must(await t.cursorTo(row(wep.name), { max: m.stock.length + 2, dir: 'up' }), `the cursor never reaches "${wep.name}"`); all = await viewText(t);
+    t.must(all.includes(D.item[h.equipment.weapon].damage) && all.includes(wep.damage), `with the cursor on "${wep.name}" the shop does not show the damage now (${D.item[h.equipment.weapon].damage}) and with it (${wep.damage})`);
+  });
+
+  suite.test('ui.battle.controls', 'battle: the controls shown are the ones that work, in words: A attacks, B runs, START is for items; no hint for something else', async (t) => {
+    await t.play(); await setup(t, `a.addItem('potion-of-healing')`); await fight(t, weak.id);
+    const lines = await t.lines(), hints = lines.filter((l) => /\b(A|B|START)\b\s*[:=]?\s*[A-Za-z]/.test(l) && !/attacks!/.test(l)).join(' | ');
+    const bad = [];
+    if (!/\bA\b\s*[:=]?\s*(attack|fight|strike)/i.test(hints)) bad.push('no "A: attack"');
+    if (!/\bB\b\s*[:=]?\s*(run|flee|escape)/i.test(hints)) bad.push('no "B: run"');
+    if (!/\bSTART\b\s*[:=]?\s*(item|drink|potion|bag|heal)/i.test(hints)) bad.push('no "START: items"');
+    if (/\bSTART\b\s*[:=]?\s*menu/i.test(hints)) bad.push('"START: menu" is shown, but START opens no menu in a battle');
+    const labels = lines.filter((l) => /^d\d+$/.test(l.trim()));
+    if (labels.length) bad.push(`bare dice labels (${[...new Set(labels)].join(', ')}) stand under numbers that are not that die`);
+    await setup(t, 'T.shut()');
+    t.must(!bad.length, `${bad.join('; ')} (hints drawn: ${hints || 'none'})`);
+  });
+
+  suite.test('ui.battle.narration', 'battle: the log tells the fight in whole short sentences that name who acts, in varied words; win, loss and flight are told; nothing is cut in the log box', async (t) => {
+    await t.play(); await setup(t, 'a.setEncounters(false)');
+    const who = (await t.ev('T.hero().name')), foe = [...D.monsters].filter((m) => m.hp >= 60 && m.name.length >= 14).sort((a, b) => a.xp - b.xp)[0] || strong;
+    await fight(t, foe.id, 3); await t.ev('TA.setHp(99999)');
+    const cut = []; let log = [];
+    for (let i = 0; i < 24 && (await t.state()).battle; i++) { await t.A(60); log = await t.ev('window.__game.battle.log.slice()');
+      const drawn = (await viewText(t)).toLowerCase().replace(/[^a-z0-9]/g, ''), lastLine = log[log.length - 1] || '';
+      if ((await t.state()).battle && !drawn.includes(lastLine.toLowerCase().replace(/[^a-z0-9]/g, ''))) cut.push(lastLine); }
+    await t.ev('TA.setHp(T.hero().maxHp)'); await setup(t, 'T.shut()');
+    const sentence = (l) => /^[A-Z"'].*[.!?…"']$/.test(l.trim()) && l.trim().split(/\s+/).length >= 3 && !/=/.test(l) && !/\b[A-Z]{3,}\b/.test(l.replace(/\bHP\b|\bXP\b|\bAC\b/g, ''));
+    const names = (l) => new RegExp(`\\b(you|your|${esc(who)}|${esc(foe.name)}|${esc(foe.name.split(' ').pop())})\\b`, 'i').test(l);
+    const notS = log.filter((l) => !sentence(l)), anon = log.filter((l) => !names(l));
+    const shape = (l) => l.replace(/\d+/g, '#'), mine = new Set(log.filter((l) => /^(you|your)\b/i.test(l) || l.startsWith(who)).map(shape)), theirs = new Set(log.filter((l) => l.toLowerCase().includes(foe.name.toLowerCase().split(' ').pop()) && !(/^(you|your)\b/i.test(l) || l.startsWith(who))).map(shape));
+    // the three endings
+    const ends = {};
+    t.must(await hook(t, `actions.forceBattle(${JSON.stringify(weak.id)})`), 'set-up: forceBattle returned false'); for (let i = 0; i < 80 && (await t.state()).battle; i++) await t.A(40);
+    ends.win = await t.ev('window.__game.battle.log.slice(-1)[0]'); await t.readAll(); await setup(t, 'T.shut()'); await t.ev('T.idle()');
+    for (let i = 0; i < 30 && !ends.flee; i++) { await t.ev('TA.setHp(T.hero().maxHp)'); await hook(t, `actions.forceBattle(${JSON.stringify(weak.id)})`); await sleep(60); await t.B(120);
+      if ((await t.state()).result === 'fled') ends.flee = await t.ev('window.__game.battle.log.slice(-1)[0]'); await setup(t, 'T.shut()'); await t.ev('T.idle()'); }
+    const bad = [];
+    if (notS.length) bad.push(`${notS.length} of ${log.length} log lines are not sentences, such as ${JSON.stringify(notS.slice(-2))}`);
+    if (anon.length) bad.push(`${anon.length} lines do not name who acts`);
+    if (mine.size < 3 || theirs.size < 3) bad.push(`the hero's blows are told in ${mine.size} ways and the foe's in ${theirs.size} (wanted at least 3 each over ${log.length} lines)`);
+    for (const [k, l] of Object.entries(ends)) if (!l || !sentence(l)) bad.push(`the ${k} is not told in a sentence (${JSON.stringify(l || '')})`);
+    if (!ends.flee) bad.push('no flight could be told (B never got away in 30 tries)');
+    if (cut.length) bad.push(`${cut.length} lines were cut in the log box, such as ${JSON.stringify(cut[0])}`);
+    t.must(!bad.length, bad.join('; '));
+  }, { timeout: 180000 });
+
+  suite.test('ui.chests.loot', 'chests: every chest in a house (window.__game.chests) gives loot once, from the data\'s loot table, the same after a reload of the save, not the same in every game', async (t) => {
+    const table = W.loot || (W.meta && W.meta.loot);
+    const open1 = async () => { await t.play(); await setup(t, 'a.setEncounters(false)'); return (await hook(t, 'chests')) || null; };
+    const chests = await open1();
+    t.must(Array.isArray(chests) && chests.length, 'window.__game.chests is missing or empty: no house has a chest with loot');
+    t.must(table, 'data/world.json has no `loot` table for chests');
+    const take = async (c) => { const b = await t.ev('({ inv: window.__game.inventory.slice(), gold: window.__game.gold })'); await press(t, c); const said = await t.readAll();
+      const a = await t.ev('({ inv: window.__game.inventory.slice(), gold: window.__game.gold })'); return { got: [...a.inv.filter((n, i) => a.inv.indexOf(n) === i && a.inv.filter((x) => x === n).length > b.inv.filter((x) => x === n).length), ...(a.gold > b.gold ? [`${a.gold - b.gold} gp`] : [])].join(', '), said }; };
+    await setup(t, 'a.save(); T.shut()');
+    const first = []; for (const c of chests) { const r = await take(c); t.must(r.got, `the chest at ${c.map} ${c.x},${c.y} gave nothing; it said ${JSON.stringify(r.said[0] || '')}`); first.push(r.got);
+      const again = await take(c); t.must(!again.got, `the chest at ${c.map} ${c.x},${c.y} gave loot a second time`); }
+    await setup(t, 'a.load()'); await t.ev('T.idle()'); await setup(t, 'T.shut()');
+    const second = []; for (const c of chests) second.push((await take(c)).got);
+    t.eq(second, first, 'after loading the save made before the chests were opened, the loot');
+    let differs = false; for (let i = 0; i < 3 && !differs; i++) { const cs = await open1(), now = []; for (const c of cs) now.push((await take(c)).got); differs = JSON.stringify(now) !== JSON.stringify(first); }
+    t.must(differs, 'three new games gave exactly the same loot in every chest: it is not random');
+    return `${chests.length} chests`;
+  }, { timeout: 240000 });
+
+  suite.test('ui.doors.houses', 'houses: every settlement has house doors (window.__game.doors), and walking into each leads to an interior and back out', async (t) => {
+    await t.play(); await setup(t, 'a.setEncounters(false)');
+    const doors = (await hook(t, 'doors')) || null, zones = await hook(t, 'world.zones');
+    t.must(Array.isArray(doors) && doors.length, 'window.__game.doors is missing: only the hero\'s own house can be entered');
+    const towns = zones.filter((z) => isSettlement(W.zones.find((d) => d.id === z.id))), none = towns.filter((z) => !doors.some((d) => d.map === z.map)).map((z) => z.name);
+    t.must(!none.length, `no house can be entered in ${none.join(', ')}`);
+    const zoneMaps = new Set(zones.map((z) => z.map)), bad = [];
+    for (const d of doors) { const s = await t.ev(`T.standBy(${JSON.stringify(d)})`).catch(() => null);
+      if (!s) { bad.push(`the door at ${d.map} ${d.x},${d.y} cannot be reached`); continue; }
+      await t.arrow(s.dir, 80); await t.ev('T.idle()'); await sleep(150); if ((await t.state()).map === d.map) { await t.A(300); await t.ev('T.idle()'); }
+      const inside = (await t.state()).map; if (inside === d.map || zoneMaps.has(inside)) bad.push(`the door at ${d.map} ${d.x},${d.y} leads nowhere (the hero is on ${inside})`); }
+    t.must(!bad.length, `${bad.length} of ${doors.length} doors: ${bad.slice(0, 3).join('; ')}`);
+    return `${doors.length} doors in ${towns.length} settlements`;
+  }, { timeout: 240000 });
+
+  suite.test('ui.layout.quest', 'layout: the Quest page is drawn clean at every step of the story and with every side quest begun', async (t) => {
+    await t.play(); await setup(t, 'a.setEncounters(false)'); const bad = [];
+    const look = async (when) => { await t.menu('Quest'); bad.push(...(await layout(t, `Quest page ${when}`))); await t.B(150); await setup(t, 'T.shut()'); };
+    for (let j = 0; j < W.quests.side.length; j++) await t.ev(`T.hookPlay('side', ${j}, 1)`, 60000);
+    await look('with every side quest begun');
+    for (let i = 0; i < W.quests.main.length; i++) for (let k = 1; k <= W.quests.main[i].steps.length; k++) { await t.ev(`T.hookPlay('main', ${i}, ${k})`, 60000); await look(`chapter ${i + 1} step ${k}`); if (bad.length > 3) break; }
+    t.must(!bad.length, bad.slice(0, 3).join(' | '));
+  }, { timeout: 240000 });
 
   // ---------------------------------------------------------------- every screen is drawn clean
   suite.test('ui.layout.talk', 'layout: every page the people of the start zone say fits the dialogue box', async (t) => {

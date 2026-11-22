@@ -19,5 +19,6 @@ Goes into round 4 together with REVIEW-v0.5.md's proposed round 4 (author approv
 10. (added) Unclear what the "?" and "–" in the battle screen are for. We should mock up some options.
 11. (added) It should be clear how buying things (a dagger?) changes the AC or damage, etc.
 12. (added) We need a bed in the main town where you can rest for free.
+13. (added) The status bar should only show on the normal map view; not in battles (nor on the title).
 
 Positive (keep as is): the defeat outcomes ("deaths are now great").
