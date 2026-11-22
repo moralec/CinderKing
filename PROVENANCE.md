@@ -19,7 +19,8 @@ party before the claim is made.
 | Engine | Phaser 3 | Third party (MIT) | — | task/lib/ |
 | Tiles and current sprites | Kenney Tiny Dungeon | Third party (CC0) | — | task/assets/dungeon.png, docs/designs/sprite-bakeoff/packs/ |
 | Sprites for all monsters and items (chosen) | DawnLike v1.81 (DragonDePlatino, DawnBringer) + Kenney Tiny Dungeon; choice by the operator, blind | Third party (CC-BY-4.0 / CC0); Human choice | 22 Nov | docs/designs/sprite-bakeoff/BAKEOFF.md (17/20 free packs) |
-| Sprite matching (which frame for which monster/item) | gemma-4-12B with vision, on the T4 | Local | queued 22 Nov | bench/coding-semi/sprite_match.py → docs/designs/sprite-bakeoff/sprites.json |
+| Sprite matching (which frame for which monster/item) | gemma-4-12B with vision, on the T4 | Local | 22 Nov (pass 1: 13/20 recognisable vs the author's blind picks) | bench/coding-semi/sprite_match.py → docs/designs/sprite-bakeoff/sprites.json |
+| Sprite matching pass 2 (fixes the local picks) | Claude vision sub-agent, author's request ("get the sprites out of the way") | **Cloud** (selection among third-party frames) | 22 Nov | docs/designs/sprite-bakeoff/sprites.json entries with rule claude-vision |
 | Plan A, one session (18 steps) | Qwen3.6-35B-A3B in Pi + game archetype | Local ($0 cloud) | 22 Nov 11:54-12:37 | plans/r4a-local/, runs/R4L/planner.json |
 | Plan B, staged (26 steps + 9 harness gates) | Qwen3.6-35B-A3B in Pi, stage by stage + archetype; gates inserted by the harness | Local ($0 cloud) | 22 Nov 12:37- | plans/r4a-staged/, runs/R4T/planner.json |
 | Game code, round 4 | (pending: the build of the chosen local plan) | Local | — | runs/R4L or R4T |
