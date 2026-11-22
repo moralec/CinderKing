@@ -1,0 +1,12 @@
+{
+ "note": "What happens when a battle is lost. outcomes: one is drawn by the dice. fee: the share of the gold a helping hand asks. finders: the roles of people who may find the hero. In the pages {who} = who finds him, {place} = where he wakes, {fee} = gold paid, {gold} = gold lost, {n} = things taken from the bag.",
+ "outcomes": ["hand", "robbed", "town"],
+ "fee": 0.1,
+ "finders": ["lore", "helper", "merchant", "side"],
+ "stranger": "A passing tinker",
+ "door": "the door of {site}",
+ "fall": "Your knees give way. The world goes dark.",
+ "hand": ["{who} finds you and carries you to {place}.", "You wake rested and whole. The broth and the bed cost {fee} gp."],
+ "robbed": ["You wake in the dirt. Thieves took {gold} gp. Things gone from your bag: {n}.", "{who} finds you there and brings you to {place}, whole again."],
+ "town": ["Strangers carry you to {place} and leave you on a bench.", "You wake sore, at half strength. Your {gold} gp are gone."]
+}

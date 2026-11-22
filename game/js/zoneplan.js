@@ -25,27 +25,63 @@ function hashText(text) {
   return h >>> 0;
 }
 
+// Smooth field: a coarse grid of random values, blended between
+// the four grid points around each tile; then every tile gets its rank.
+function zoneField(rnd, cw, ch) {
+  const gw = Math.ceil(ZW / cw) + 2;
+  const gh = Math.ceil(ZH / ch) + 2;
+  const g = [];
+  for (let i = 0; i < gw * gh; i++) {
+    g.push(rnd());
+  }
+  const ease = t => t * t * (3 - 2 * t);
+  const all = [];
+  for (let y = 0; y < ZH; y++) {
+    for (let x = 0; x < ZW; x++) {
+      const fx = x / cw;
+      const fy = y / ch;
+      const ix = Math.floor(fx);
+      const iy = Math.floor(fy);
+      const tx = ease(fx - ix);
+      const ty = ease(fy - iy);
+      const a = g[iy * gw + ix];
+      const b = g[iy * gw + ix + 1];
+      const c = g[(iy + 1) * gw + ix];
+      const d = g[(iy + 1) * gw + ix + 1];
+      all.push({ x, y, v: (a + (b - a) * tx) * (1 - ty) + (c + (d - c) * tx) * ty });
+    }
+  }
+  all.sort((p, q) => p.v - q.v || p.y - q.y || p.x - q.x);
+  const out = [];
+  for (let y = 0; y < ZH; y++) {
+    out.push(new Array(ZW).fill(0));
+  }
+  all.forEach((p, i) => { out[p.y][p.x] = i / all.length; });
+  return out;
+}
+
 // Main layout function
 function zonePlan(zone, biome) {
   const rnd = rng(hashText(zone.id + '/' + zone.biome));
 
-  // Step 1: every tile — outer ring 'solid'; inside: solid/scatter/ground
+  // Step 1: three fields; solid in clumps, scatter at their edges, the rest ground
+  const lump = zoneField(rnd, 4, 3), kind = zoneField(rnd, 7, 5), lay = zoneField(rnd, 6, 2);
+  const share = 0.3 + 0.02 * biome.solid.length;
   const roles = [];
-  const insideSolidChance = 0.08 + 0.04 * biome.solid.length;
   for (let y = 0; y < ZH; y++) {
     const row = [];
     for (let x = 0; x < ZW; x++) {
+      const v = lump[y][x], coin = rnd();
       if (y === 0 || y === ZH - 1 || x === 0 || x === ZW - 1) {
         row.push('solid');
+      } else if (v >= 1 - share) {
+        row.push('solid');
+      } else if (v >= 1 - share - 0.14 && coin < 0.6) {
+        row.push('scatter');
+      } else if (coin < 0.02) {
+        row.push('scatter');
       } else {
-        const r = rnd();
-        if (r < insideSolidChance) {
-          row.push('solid');
-        } else if (r < insideSolidChance + 0.08) {
-          row.push('scatter');
-        } else {
-          row.push('ground');
-        }
+        row.push('ground');
       }
     }
     roles.push(row);
@@ -153,8 +189,7 @@ function zonePlan(zone, biome) {
   }
 
   return {
-    roles,
-    exits,
+    roles, kind, lay, exits,
     slots: slots.map(s => ({ x: s.x, y: s.y })),
     spawn: { x: 12, y: 8 }
   };

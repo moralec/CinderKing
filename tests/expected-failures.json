@@ -1,0 +1,211 @@
+{
+ "note": "Tests the starting build of round 4 fails, why, the item of REVIEW-v0.5.md, and the step that fixes it. Measured on v0.5 (build R4F2) on 22 Nov 2026. The three entries fixed by round 3 turn into XPASS once round 3 lands: remove them then. A step removes its entries when its tests pass under --must; a finished round passes --strict.",
+ "baseline": "v0.5 (R4F2, qwen3635ba3b)",
+ "expected": {
+  "data.rest": {
+   "why": "4 of the 5 settlements have nobody who offers a bed",
+   "ref": "P1-4",
+   "fix": "round 4 step 3 (rest and defeat)"
+  },
+  "data.notes": {
+   "why": "11 texts of world.json still carry notes to the developer (\"your round 3 quest giver\")",
+   "ref": "P3-5",
+   "fix": "round 4 step 6 or round 5"
+  },
+  "data.sprites.questitems": {
+   "why": "the 17 quest things have no picture",
+   "ref": "P3-9",
+   "fix": "round 5 (art)"
+  },
+  "credits.srd.sentence": {
+   "why": "the Credits page names the SRD but not the sentence and the two addresses ATTRIBUTION.md requires",
+   "ref": "P1-7",
+   "fix": "round 4 step 11 (credits)"
+  },
+  "credits.unaffiliated": {
+   "why": "the Credits page does not say the game is not affiliated with Wizards of the Coast",
+   "ref": "P1-7",
+   "fix": "round 4 step 11 (credits)"
+  },
+  "ui.title.continue": {
+   "why": "the title has no Continue: a reload starts a new game",
+   "ref": "P2-11",
+   "fix": "round 4 step 8 (ending and title)"
+  },
+  "ui.status.zone": {
+   "why": "the strip does not name the place",
+   "ref": "round 3 feedback",
+   "fix": "round 3 step 71 (status bar)"
+  },
+  "ui.status.nobuttons": {
+   "why": "the strip still draws the A, B and START buttons",
+   "ref": "round 3 feedback",
+   "fix": "round 3 step 70 (no buttons)"
+  },
+  "ui.items.list": {
+   "why": "A on Items drinks a Healing Draught; there is no list with a cursor, and only 5 things are shown",
+   "ref": "P1-5",
+   "fix": "round 4 step 2 (items and gear)"
+  },
+  "ui.items.drink": {
+   "why": "a Potion of Healing cannot be drunk from the menu",
+   "ref": "P1-5",
+   "fix": "round 4 step 2 (items and gear)"
+  },
+  "ui.items.equip": {
+   "why": "nothing can be worn from the menu: every armour, weapon and ring the story gives is dead without the test hook",
+   "ref": "P1-5",
+   "fix": "round 4 step 2 (items and gear)"
+  },
+  "ui.items.unequip": {
+   "why": "worn gear is not in the list and cannot be taken off",
+   "ref": "P1-5",
+   "fix": "round 4 step 2 (items and gear)"
+  },
+  "ui.items.worn": {
+   "why": "no page shows what the hero wears",
+   "ref": "P1-5",
+   "fix": "round 4 step 2 (items and gear)"
+  },
+  "ui.shop.confirm": {
+   "why": "A buys at once, so A through the merchant's greeting buys the first ware",
+   "ref": "P2-4",
+   "fix": "round 4 step 10 (shop)"
+  },
+  "ui.shop.sell": {
+   "why": "there is no way to sell with the keys",
+   "ref": "P2-4",
+   "fix": "round 4 step 10 (shop)"
+  },
+  "ui.rest.inn": {
+   "why": "the innkeeper promises a bed and nothing heals",
+   "ref": "P1-4",
+   "fix": "round 4 step 3 (rest and defeat)"
+  },
+  "ui.rest.bed": {
+   "why": "the house has no bed to rest in",
+   "ref": "P1-4",
+   "fix": "round 4 step 3 (rest and defeat)"
+  },
+  "ui.battle.potion": {
+   "why": "START in a battle drinks only the round-3 Healing Draught, never a Potion of Healing",
+   "ref": "P1-5",
+   "fix": "round 4 step 2 (items and gear)"
+  },
+  "ui.battle.turn": {
+   "why": "a drink in battle costs no turn",
+   "ref": "P1-3",
+   "fix": "round 4 step 3 (rest and defeat)"
+  },
+  "ui.flee.fails": {
+   "why": "running always works",
+   "ref": "P1-3",
+   "fix": "round 4 step 3 (rest and defeat)"
+  },
+  "ui.flee.boss": {
+   "why": "a story boss can be walked away from",
+   "ref": "P1-3",
+   "fix": "round 4 step 3 (rest and defeat)"
+  },
+  "ui.defeat.price": {
+   "why": "losing costs nothing and heals to full",
+   "ref": "P1-3",
+   "fix": "round 3 steps 67-69 (defeat)"
+  },
+  "ui.battle.names": {
+   "why": "long boss names are cut mid-word (\"Vharaxis, the Ci\")",
+   "ref": "P2-2",
+   "fix": "round 4 step 9 (text fit)"
+  },
+  "story.ending.card": {
+   "why": "the end card shows behind the last talk and vanishes when it closes",
+   "ref": "P1-6",
+   "fix": "round 4 step 8 (ending and title)"
+  },
+  "story.ending.credits": {
+   "why": "no credits roll after the ending",
+   "ref": "P1-6",
+   "fix": "round 4 step 8 (ending and title)"
+  },
+  "story.ending.title": {
+   "why": "the game does not return to the title after the ending",
+   "ref": "P1-6",
+   "fix": "round 4 step 8 (ending and title)"
+  },
+  "story.rewards": {
+   "why": "chapter 1 pays its XP twice (60 hard-coded, then the data's 300)",
+   "ref": "P1-2",
+   "fix": "round 4 step 6 (reward curve)"
+  },
+  "story.boss.intro": {
+   "why": "a boss's challenge is shown after he is defeated: defeat steps have no `intro`",
+   "ref": "P2-5",
+   "fix": "round 4 step 7 (the full story)"
+  },
+  "story.pages.whole": {
+   "why": "pages are cut every 78 letters, leaving pages like \"it.\"",
+   "ref": "P2-1",
+   "fix": "round 4 step 9 (text fit)"
+  },
+  "story.pages.fit": {
+   "why": "3 pages of the story wrap to 4 lines; the 4th line falls below the dialogue box, dark on dark, and cannot be read",
+   "ref": "P2-1",
+   "fix": "round 4 step 9 (text fit)"
+  },
+  "balance.hero.fixed": {
+   "why": "every new game rolls a different hero",
+   "ref": "P2-13",
+   "fix": "round 4 step 4 (a fixed hero)"
+  },
+  "balance.hero.hp": {
+   "why": "HP is a full d8 a level; rules.json gives the Ranger a d10 and the average after level 1",
+   "ref": "P2-13",
+   "fix": "round 4 step 4 (a fixed hero)"
+  },
+  "balance.boss.1": {
+   "why": "23 % at level 1, the level the story really gives (the review's 61 % assumed level 2)",
+   "ref": "P1-1",
+   "fix": "round 4 step 5 (boss balance)"
+  },
+  "balance.boss.2": {
+   "why": "under 1 %: Garrick Redcap cannot be beaten at level 2",
+   "ref": "P1-1",
+   "fix": "round 4 step 5 (boss balance)"
+  },
+  "balance.boss.3": {
+   "why": "about 2 %: Old Mother Brine cannot be beaten at level 3",
+   "ref": "P1-1",
+   "fix": "round 4 step 5 (boss balance)"
+  },
+  "balance.boss.4": {
+   "why": "about a third at level 4 without a shield (the review's 49 % had one)",
+   "ref": "P1-1",
+   "fix": "round 4 step 5 (boss balance)"
+  },
+  "balance.boss.5": {
+   "why": "0 %: the ettin cannot be beaten at level 4",
+   "ref": "P1-1",
+   "fix": "round 4 step 5 (boss balance)"
+  },
+  "balance.boss.6": {
+   "why": "0 %: Hoarfang cannot be beaten at level 5",
+   "ref": "P1-1",
+   "fix": "round 4 step 5 (boss balance)"
+  },
+  "balance.boss.7": {
+   "why": "about 100 %: the High Cantor is no contest",
+   "ref": "P1-1",
+   "fix": "round 4 step 5 (boss balance)"
+  },
+  "balance.boss.8": {
+   "why": "0 %: the Cinder King cannot be beaten at level 6; winter against fire is not a mechanic",
+   "ref": "P1-1",
+   "fix": "round 4 step 5 (boss balance)"
+  },
+  "balance.rewards.curve": {
+   "why": "The Pale Lady pays 10,000 XP and 1,000 gp, 3.4 and 2.5 times the best chapter",
+   "ref": "P1-2",
+   "fix": "round 4 step 6 (reward curve)"
+  }
+ }
+}

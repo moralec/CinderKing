@@ -16,10 +16,11 @@ function makeZone(zone, biome) {
   const roleTileSymbol = {};
   let symIdx = 0;
 
-  function pickTile(role) {
+  function pickTile(role, x, y) {
     if (role === 'danger') return biome.danger;
     const list = biome[role];
-    return list[Math.floor(rnd() * list.length)];
+    const v = role === 'solid' ? plan.kind[y][x] : role === 'scatter' ? rnd() : plan.lay[y][x];
+    return list[Math.floor(v * list.length)];
   }
 
   function getSymbol(role, tile) {
@@ -55,7 +56,7 @@ function makeZone(zone, biome) {
     let row = '';
     for (let x = 0; x < 24; x++) {
       const role = plan.roles[y][x];
-      const tile = pickTile(role);
+      const tile = pickTile(role, x, y);
       row += getSymbol(role, tile);
     }
     rows.push(row);

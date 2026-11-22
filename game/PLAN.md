@@ -55,3 +55,16 @@
 - [x] 53 js/title.js: title screen with cover and "Press START"
 - [x] 54 js/pages.js: Credits pages with SRD, DawnLike, Kenney, font, and credits
 - [x] 55 PLAN.md: the gate; all 53 tests pass
+- [x] 60 data/sprites.json: the Giant Frog's corrected picture
+- [x] 61 js/foestage.js: dark stage behind the foe in battle
+- [x] 62 js/data.js: whole tiles for the house floor, no crates in walls
+- [x] 63 js/zoneplan.js: zoneField(rnd, cw, ch) smooth field of ranks
+- [x] 64 js/zoneplan.js: zonePlan with plan.kind and plan.lay for clumped land
+- [x] 65 js/zonegen.js: makeZone one kind per clump, ground in patches
+- [x] 66 data/world.json: six biome lines for snow, desert, volcano, canyon, ruins, graveyard
+- [x] 67 js/defeat.js: Defeat.pick/place/finder/loot and data/defeat.json
+- [x] 68 js/defeatrun.js: Defeat.run/move/last; a lost battle has a price
+- [x] 69 js/defeatveil.js: Defeat.veil and Defeat.dark; view goes dark on defeat
+- [x] 70 js/nobuttons.js: no drawn buttons in the strip; touch zones and keys work
+- [x] 71 js/statusbar.js: status bar with zone, HP bar, level, gold, and hint
+- [x] 72 PLAN.md: the gate; all 63 tests pass

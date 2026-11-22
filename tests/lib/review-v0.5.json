@@ -1,0 +1,14 @@
+{
+ "note": "The balance table of REVIEW-v0.5.md (22 Nov 2026), for `node tests/run.mjs <v0.5 build> --only balance.calibration --calibrate`: with these levels and this gear the simulation must give these win rates, 5 points either way. level and ac are the review's columns 'Level reached' and 'AC worn'; win = % won with no potion and with 3 potions. `also` = gear the review's hero wore beyond the story's rewards, read off its AC column: a shield (10 gp at the first shop) from chapter 2 on. The review's levels for chapters 1 and 2 are one higher than the story gives (tests/README.md, 'Calibration').",
+ "hero": { "str": 12, "dex": 14, "con": 11, "int": 10, "wis": 10, "cha": 10 },
+ "bosses": [
+  { "boss": "the Gravecaller", "level": 2, "ac": 13, "win": [61, 91] },
+  { "boss": "Garrick Redcap", "level": 3, "ac": 15, "win": [2, 11], "also": ["shield"] },
+  { "boss": "Old Mother Brine", "level": 3, "ac": 17, "win": [2, 14], "also": ["shield"] },
+  { "boss": "Mirefang", "level": 4, "ac": 18, "win": [49, 76], "also": ["shield"] },
+  { "boss": "Grum-and-Gorl", "level": 4, "ac": 19, "win": [1, 2], "also": ["shield"] },
+  { "boss": "Hoarfang", "level": 5, "ac": 20, "win": [0, 0], "also": ["shield"] },
+  { "boss": "High Cantor Sereth Vane", "level": 5, "ac": 20, "win": [100, 100], "also": ["shield"] },
+  { "boss": "Vharaxis", "level": 6, "ac": 21, "win": [0, 0], "also": ["shield"] }
+ ]
+}

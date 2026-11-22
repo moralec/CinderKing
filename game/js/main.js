@@ -26,7 +26,8 @@ window.__game = {
     return {
       up: page(BTN.up), down: page(BTN.down),
       left: page(BTN.left), right: page(BTN.right),
-      a: page(BTN.a), b: page(BTN.b)
+      a: page(BTN.a), b: page(BTN.b),
+      start: page(BTN.start)
     };
   },
   actions: {

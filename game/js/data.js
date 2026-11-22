@@ -22,7 +22,8 @@ const TOWN_LEGEND = {
 };
 const HOUSE_LEGEND = {
   '#':{g:126,solid:1}, '%':{g:125,solid:1}, '_':{g:109}, 'E':{g:103},
-  'B':{g:124}
+  'q':{g:96}, 'w':{g:97}, 'e':{g:98},
+  'a':{g:120}, 's':{g:121}, 'd':{g:122}
 };
 
 const MAPS = {
@@ -55,8 +56,8 @@ const MAPS = {
       '####%####%######',
       '#______________#',
       '#______________#',
-      '#__BBBBBBBBBB__#',
-      '#__BBBBBBBBBB__#',
+      '#__qwwwwwwwwe__#',
+      '#__assssssssd__#',
       '#______________#',
       '#______________#',
       '#______________#',
@@ -66,8 +67,8 @@ const MAPS = {
       {x:2,y:1,key:'dun',frame:63}, {x:3,y:1,key:'dun',frame:63},
       {x:13,y:1,key:'dun',frame:89},
       {x:11,y:3,key:'dun',frame:72}, {x:10,y:3,key:'dun',frame:73}, {x:12,y:3,key:'dun',frame:73},
-      {x:1,y:5,key:'dun',frame:63}, {x:0,y:5,key:'dun',frame:63},
-      {x:14,y:5,key:'dun',frame:63}, {x:15,y:5,key:'dun',frame:63},
+      {x:1,y:5,key:'dun',frame:63},
+      {x:14,y:5,key:'dun',frame:63},
       {x:1,y:7,key:'dun',frame:90}, {x:2,y:7,key:'dun',frame:91}
     ],
     npcs:  [],
