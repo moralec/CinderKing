@@ -1,0 +1,15 @@
+The Cinder King: original content licence
+
+Copyright (c) 2026 The Cinder King authors
+
+The game's original non-code content (the story, quest and dialogue text, the world data in
+game/data/world.json and game/data/WORLD.md, the story documents in story/, and the cover art in
+story/art/) is licensed under the Creative Commons Attribution 4.0 International licence (CC BY 4.0).
+
+You may share and adapt it for any purpose, including commercially, as long as you give appropriate
+credit ("The Cinder King authors"), link to the licence, and indicate if changes were made.
+
+Licence text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Third-party content (SRD 5.1 monsters/items/rules, fonts, tiles, sprites) keeps its own licence;
+see CREDITS.md and game/data/srd/ATTRIBUTION.md.
