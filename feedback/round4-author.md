@@ -16,3 +16,4 @@ Verbatim (numbering as written):
 
 Goes into round 4 together with REVIEW-v0.5.md's proposed round 4 (author approved both, 22 Nov).
 9. (added) Narration in the battles should be better.
+10. (added) Unclear what the "?" and "–" in the battle screen are for. We should mock up some options.
