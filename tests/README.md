@@ -62,15 +62,36 @@ driver), `adapter.mjs`, `gate.mjs` and `replay-rpg.mjs` (the build kit's rounds 
   takes off gear that is worn (worn gear is in the list too). The weapon and armour worn are named on the Party or Items page.
 - **Shop:** the first A on a ware asks, the second buys, B takes it back. ArrowRight shows the Sell list (the word "Sell" is on
   the screen); A sells for half the price.
-- **Rest:** A through an innkeeper's talk restores all HP (a fee is allowed; the answer defaults to yes). The bed in the house is
-  `window.__game.landmarks.bed`.
+- **Rest:** A through an innkeeper's talk restores all HP for a fee in gold (the answer defaults to yes).
 - **Battle:** START drinks or opens a list of the bag (A takes the row). A drink costs the turn. B can fail, often enough to be
   seen in 30 tries and not always (a chance between about 15 % and 85 %); it never works on a story boss.
 - **Saves:** the hook's `save()` and `load()` stay quick and ask nothing: the simulation loads a save before each of its fights.
   After the ending the game keeps the won state, so that Continue on the title returns to it.
 - **Ending:** the end card comes after the last line and stays; START rolls the credits (A turns pages); then the title, where
   START on `Continue` returns to the won game.
-- **Title:** with a save, `Continue` is the entry START takes.
+- **Title:** with a save, `Continue` is the entry START takes. Something on it moves. No status bar on it.
+- **A new game:** after START the story's introduction (`meta.story` of the data) is told in pages turned by A, before the
+  hero can move.
+- **Status bar:** drawn while the hero walks the map (also under a dialogue box or the shop). Not on the title and not in a
+  battle; the battle screen then uses the whole canvas.
+- **Text:** no text of the view ends below y 140, where every box of the view ends (dialogue, menu, shop, battle log).
+- **Battle screen:** hints in words for the keys that work there (A attack, B run, START items) and for no other; no bare "?",
+  "-" or die label. The foe stands on the battle ground: under a quarter of the area around its picture is near-black. The log
+  is narration: whole sentences that name who acts, at least three wordings each for the hero's and the foe's blows, the win,
+  the loss and the flight told too, each line drawn whole.
+- **What a thing does:** in the shop and on the Items page, a piece of gear under the cursor shows the hero's armour class (or
+  damage dice) now and with it, marked better or worse; a thing with no use says so. The Items page labels two groups, worn
+  and bag, and the row under the cursor says what A does (drink, wear, take off).
+- **Shop list:** with more than five wares, at least five are drawn at every cursor position, or a mark shows the list goes on.
+- **Quests:** the first step of every quest shows a "quest added" page that names the quest.
+- **Map foes:** a quest foe on the map is drawn with its picture of `data/sprites.json`.
+- **Houses and chests:** `window.__game.doors` lists every house door `{ map, x, y }` (at least one in every settlement); walking
+  into one leads to an interior. `window.__game.chests` lists the chests in houses; each gives loot once, drawn from a `loot`
+  table in `data/world.json`, the same after loading a save made before it was opened, and not the same in every new game.
+- **Defeat:** a lost battle costs something. Out in the world the hero then wakes at home in the start town (by his bed),
+  whichever outcome is drawn, and the telling names the place; inside a site (the crypt) he wakes at its door, on the same map.
+- **The free bed:** `window.__game.landmarks.bed` is in the start town (or a house of it), can be walked to from the start
+  without a fight, and A on it restores all HP for no gold and says so. An inn takes a fee.
 
 ### What the suite expects of the data
 
@@ -106,8 +127,9 @@ The numbers are constants at the top of `balance.mjs` (`BAND`, `CURVE`).
 
 ## Expected failures
 
-`expected-failures.json` is the to-do list a machine can check: every test the starting build of round 4 fails, why, the item of
-`REVIEW-v0.5.md` it comes from, and the round-4 step that fixes it. A step is done when its tests pass under `--must`; its
+`expected-failures.json` is the to-do list a machine can check: every test the starting build of round 4 (v0.6) fails, why,
+where it comes from (an item of `REVIEW-v0.5.md` or of the author's notes in `feedback/round4-author.md`), and the round-4 step
+that fixes it. A step is done when its tests pass under `--must`; its
 entries are then removed. A finished round passes `--strict` with the list empty (or holding only what was put off, by decision).
 
 ## Calibration

@@ -22,4 +22,6 @@ Goes into round 4 together with REVIEW-v0.5.md's proposed round 4 (author approv
 13. (added) The status bar should only show on the normal map view; not in battles (nor on the title).
 14. (added) After a defeat you sometimes wake up in a different town. That's unexpected. (Plan: always wake in Brindlemere, in the hero's house next to the free bed, unless a crypt/house loss keeps you at that door for a retry; the dialogue names the place.)
 
+**Decisions (22 Nov ~23:30):** battle layout **A** (classic RPG: command menu Attack / Item / Run with a cursor, the roll as one narration line, full screen, no status bar); monster portraits from **Dungeon Crawl Stone Soup 32x32 (CC0) at 2x on a biome backdrop strip**, no black box (recolour a fully cleared tile for the red dragons). Mock-ups: LocalAI docs/designs/sprite-bakeoff/battle-mockups/ and portraits/.
+
 Positive (keep as is): the defeat outcomes ("deaths are now great").

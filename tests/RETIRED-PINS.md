@@ -61,6 +61,15 @@ leaves the gate in the step that changes the behaviour, as round 3 did for chunk
 | chunk-53 | the title; any read of `window.__game` skips it | Continue on the title (step 8) | `ui.title.*` |
 | chunk-05, 51, `r4-fix3` chunk-68 to 71 | a drink is free; the strip; the three defeat outcomes | rest and defeat (step 3), if it changes them | `ui.battle.*`, `ui.defeat.price`, `ui.status.*` |
 
+Step tests of round 3 that pin what the author's notes on v0.6 (`feedback/round4-author.md`) ask to change:
+
+| Test | Pins | Asked | Then measured by |
+|---|---|---|---|
+| `r4-fix3` chunk-61 | the foe stands on a dark stage (`FoeStage`) | "monsters are now with black background; that is a mistake" | `ui.battle.nobox` |
+| `r4-fix3` chunk-71, `r4-fix2` chunk-51 | the status bar is drawn always | on the map only, not in battle or on the title | `ui.status.maponly`, `ui.title.nostatus` |
+| `r4-fix2` chunk-50, `r4-fix` chunk-36, 37 | the wording and boxes of the battle log and dice row | narration; no bare "?", "-", "d8" | `ui.battle.narration`, `ui.battle.controls`, `ui.layout.battle` |
+| `r4-chunks` chunk-21, 33 | quest foes on the map use the monster's old frame | their picture of `sprites.json` | `ui.map.foes` |
+
 ## 4. How round 4's plan treats them
 
 - **The gate** of round 4 is: `node tests/run.mjs <build>` (this suite, which holds the rounds 1-3 replay as `engine.replay.*`

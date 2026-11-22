@@ -271,6 +271,11 @@
    "why": "the status bar is drawn in battles; the battle screen uses only the top three quarters",
    "ref": "author on v0.6, item 13",
    "fix": "round 4"
+  },
+  "ui.defeat.home": {
+   "why": "round 3 wakes the hero in the nearest settlement, which is often another town",
+   "ref": "author on v0.6, item 14",
+   "fix": "round 4 step 3 (rest and defeat)"
   }
  }
 }

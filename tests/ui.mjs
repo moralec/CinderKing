@@ -331,6 +331,31 @@ export default function (suite, { data: D }) {
     return `cost ${price.join(', ')}; woke on ${s1.map}`;
   });
 
+  // The rule (author, item 14): a defeat out in the world always ends at home: the hero wakes in the start town, by the free bed
+  // (landmarks.bed) when there is one, whichever outcome is drawn, and the telling names the place. A defeat inside a site (the
+  // crypt, a house) still wakes him at that site's door, on the same map, so the fight can be tried again.
+  suite.test('ui.defeat.home', 'defeat: from three far zones and for every outcome the hero wakes at home in the start town (by his bed), and the telling names the place; inside a site he wakes at its door', async (t) => {
+    await t.play(); await setup(t, 'a.setEncounters(false)');
+    const zones = await hook(t, 'world.zones'), z0 = W.zones.find((z) => z.id === startZone), town = zones.find((z) => z.id === startZone).map;
+    const home = new Set([town, ...(W.sites || []).filter((x) => x.zone === startZone).map((x) => x.id)]), bed = await hook(t, 'landmarks.bed');
+    const far = W.zones.filter((z) => !isSettlement(z)).sort((a, b) => (Math.abs(b.x - z0.x) + Math.abs(b.y - z0.y)) - (Math.abs(a.x - z0.x) + Math.abs(a.y - z0.y))).slice(0, 3);
+    const outcomes = (D.defeat && D.defeat.outcomes) || [null], bad = [];
+    const lose = async (map, o) => { await t.ev(`T.go(${JSON.stringify(map)})`); await setup(t, 'a.addGold(100)'); if (o) await t.ev(`TA.forceDefeat(${JSON.stringify(o)})`);
+      t.must(await hook(t, `actions.forceBattle(${JSON.stringify(strong.id)})`), 'set-up: forceBattle returned false'); await sleep(80);
+      for (let i = 0; i < 80 && (await t.state()).battle; i++) await t.A(40);
+      t.must((await t.state()).result === 'lose', `set-up: the fight with ${strong.name} was not lost`);
+      const told = await t.readAll(); await t.ev('T.idle()'); await sleep(500); await t.ev('TA.setHp(T.hero().maxHp)'); return { told, st: await t.state() }; };
+    for (const z of far) for (const o of outcomes) { const r = await lose(zones.find((x) => x.id === z.id).map, o), w = `${z.name}${o ? ', outcome ' + o : ''}`;
+      if (!home.has(r.st.map)) { bad.push(`${w}: he wakes on ${r.st.map}, not at home in ${z0.name}`); continue; }
+      if (bed && (r.st.map !== bed.map || Math.abs(r.st.x - bed.x) + Math.abs(r.st.y - bed.y) > 3)) bad.push(`${w}: he wakes at ${r.st.map} ${r.st.x},${r.st.y}, not by his bed (${bed.map} ${bed.x},${bed.y})`);
+      if (!r.told.some((p) => p.includes(z0.name) || /\b(home|your (own )?(bed|house))\b/i.test(p))) bad.push(`${w}: the telling does not say where he wakes (${JSON.stringify(r.told.slice(-1)[0] || '')})`); }
+    const site = (W.sites || []).find((x) => (x.encounters || []).length);
+    if (site) { const r = await lose(site.id, outcomes[0]); if (r.st.map !== site.id) bad.push(`a defeat inside ${site.name} wakes him on ${r.st.map}: there he must wake at the site's door, to try again`); }
+    await t.ev('TA.forceDefeat(null)');
+    t.must(!bad.length, `${bad.length} of ${far.length * outcomes.length + (site ? 1 : 0)} defeats: ${bad.slice(0, 3).join('; ')}`);
+    return `${far.map((z) => z.name).join(', ')} x ${outcomes.length} outcomes`;
+  }, { timeout: 240000 });
+
   suite.test('ui.battle.names', 'battle: the last boss\'s name is drawn whole (or the short battle name the data gives), not cut mid-word', async (t) => {
     await t.play(); await setup(t, 'a.setEncounters(false)');
     const n = W.quests.main.length - 1, q = W.quests.main[n], k = q.steps.findIndex((s) => s.type === 'defeat'), st = q.steps[k];
