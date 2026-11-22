@@ -10,7 +10,7 @@ each build, write what is wrong or missing, and the local agents turn that into 
 
 ## Why
 
-Frontier models can build a game like this in one go. I wanted to know whether I could get to the same place with models I run
+Frontier models can build this in one go. I wanted to know whether I could get to the same place with models I run
 myself: more rounds, more time and more of my own feedback, but no dependence on a cloud service that may get more expensive or
 harder to reach. This game is the test. The goal is a complete game I can honestly say was made 100 % with local AI.
 
