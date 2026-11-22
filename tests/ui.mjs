@@ -319,12 +319,15 @@ export default function (suite, { data: D }) {
     t.must(await hook(t, `actions.forceBattle(${JSON.stringify(strong.id)})`), 'set-up: forceBattle returned false'); await sleep(100);
     for (let i = 0; i < 80 && (await t.state()).battle; i++) await t.A(40);
     const res = (await t.state()).result; t.must(res === 'lose', `set-up: the fight with ${strong.name} ended with ${res}`);
-    const told = await t.readAll(); await t.ev('T.idle()'); await sleep(600);
+    const told = [], unfit = [];
+    for (let i = 0; i < 40; i++) { const st = await t.state(); if (!st.dialogue) { if (st.idle) break; await sleep(40); continue; } told.push(st.page); unfit.push(...(await layout(t, `defeat page ${i + 1}`))); await t.A(60); }
+    await t.ev('T.idle()'); await sleep(600);
     const s1 = await t.state(), n1 = await hook(t, 'inventory.length');
     const price = [s1.gold < s0.gold && `${s0.gold - s1.gold} gp`, n1 < n0 && `${n0 - n1} things`, s1.hp < s1.maxHp && `HP ${s1.hp}/${s1.maxHp}`].filter(Boolean);
     t.must(price.length, `the defeat cost nothing: gold ${s0.gold} -> ${s1.gold}, HP ${s1.hp}/${s1.maxHp}, the bag as it was; it said ${JSON.stringify(told.slice(-1)[0] || '')}. Losing is the best healing in the game`);
     t.must(safe.has(s1.map), `the hero wakes on ${s1.map} at ${s1.x},${s1.y}, where he fell (${s0.map}); that is not a settlement`);
     t.must(!s1.battle && s1.idle, 'after the defeat the game does not take input');
+    t.must(!unfit.length, unfit.slice(0, 2).join(' | '));
     return `cost ${price.join(', ')}; woke on ${s1.map}`;
   });
 
@@ -375,7 +378,7 @@ export default function (suite, { data: D }) {
     for (const m of W.npcs.filter((n) => n.role === 'merchant')) { await openShop(t, m.id);
       for (let i = 0; i < m.stock.length; i++) { const it = D.item[m.stock[i]], mk = await t.ev('T.marked()');
         if (!mk.some((l) => row(it.name).test(l))) { bad.push(`${m.name}: after ${i} taps of ArrowDown the cursor is on ${JSON.stringify(mk[0] || '')}, not on ${it.name}`); break; }
-        const rows = (await t.lines()).filter((l) => m.stock.some((id) => row(D.item[id].name).test(l))).length, more = await t.ev('T.sees(/[▼▲↓↑…]|\\bmore\\b|\\d+\\s*\\/\\s*\\d+/i)');
+        const rows = (await t.lines()).filter((l) => m.stock.some((id) => row(D.item[id].name).test(l))).length, more = /[▼▲↓↑…]|\bmore\b|\d+\s*\/\s*\d+/i.test(await viewText(t));
         if (m.stock.length > 5 && rows < 5 && !more) { bad.push(`${m.name}: with the cursor on ware ${i + 1} of ${m.stock.length} only ${rows} wares are drawn and nothing says the list goes on`); break; }
         if (i < m.stock.length - 1) await t.key(KEY.down, 30, 240); }
       const last = D.item[m.stock[m.stock.length - 1]], g0 = (await t.state()).gold;
@@ -450,6 +453,20 @@ export default function (suite, { data: D }) {
     t.must(all.includes(D.item[h.equipment.weapon].damage) && all.includes(wep.damage), `with the cursor on "${wep.name}" the shop does not show the damage now (${D.item[h.equipment.weapon].damage}) and with it (${wep.damage})`);
   });
 
+  // The rule: the status bar belongs to the map. It is drawn while the hero walks the map (also under a dialogue box or the shop,
+  // where the map stays in view); it is not drawn on the title (ui.title.nostatus) nor in a battle, and the battle screen then
+  // uses the whole canvas, down to its bottom edge. (The Start menu may keep it or hide it.)
+  suite.test('ui.status.maponly', 'status bar: on the map only: in a battle the place and the gold are not drawn, and the battle screen uses the full height of the canvas', async (t) => {
+    await t.play(); const zone = W.zones.find((z) => z.id === startZone).name;
+    const onMap = (await strip(t)).join(' | '); t.must(/\d\s*gp\b/i.test(onMap), `set-up: on the map the bar shows no gold (${onMap})`);
+    await fight(t, weak.id);
+    const lines = await t.lines(), bar = lines.filter((l) => /\d\s*gp\b/i.test(l) || l.trim() === zone || /START:\s*menu/i.test(l));
+    const low = [...(await t.texts()), ...(await t.ev('T.sprites()'))].filter((x) => x.scene === 'UI' && x.y + x.h > 150 && !bar.includes(x.text)).length;
+    await setup(t, 'T.shut()');
+    t.must(!bar.length, `in a battle the status bar is still drawn: ${bar.join(' | ')}`);
+    t.must(low > 0, 'the battle screen leaves the bottom quarter of the canvas empty: it should use the full height once the bar is gone');
+  });
+
   suite.test('ui.battle.controls', 'battle: the controls shown are the ones that work, in words: A attacks, B runs, START is for items; no hint for something else', async (t) => {
     await t.play(); await setup(t, `a.addItem('potion-of-healing')`); await fight(t, weak.id);
     const lines = await t.lines(), hints = lines.filter((l) => /\b(A|B|START)\b\s*[:=]?\s*[A-Za-z]/.test(l) && !/attacks!/.test(l)).join(' | ');
@@ -459,6 +476,8 @@ export default function (suite, { data: D }) {
     if (!/\bSTART\b\s*[:=]?\s*(item|drink|potion|bag|heal)/i.test(hints)) bad.push('no "START: items"');
     if (/\bSTART\b\s*[:=]?\s*menu/i.test(hints)) bad.push('"START: menu" is shown, but START opens no menu in a battle');
     const labels = lines.filter((l) => /^d\d+$/.test(l.trim()));
+    const blanks = lines.filter((l) => /^[?\-–]$/.test(l.trim()));
+    if (blanks.length) bad.push(`${blanks.length} boxes show a bare "?" or "-" with nothing to say what they are`);
     if (labels.length) bad.push(`bare dice labels (${[...new Set(labels)].join(', ')}) stand under numbers that are not that die`);
     await setup(t, 'T.shut()');
     t.must(!bad.length, `${bad.join('; ')} (hints drawn: ${hints || 'none'})`);
@@ -537,16 +556,16 @@ export default function (suite, { data: D }) {
   }, { timeout: 240000 });
 
   // ---------------------------------------------------------------- every screen is drawn clean
-  suite.test('ui.layout.talk', 'layout: every page the people of the start zone say fits the dialogue box', async (t) => {
+  suite.test('ui.layout.talk', 'layout: every page every person of the world says fits the dialogue box (nothing below the text area)', async (t) => {
     await t.play(); await setup(t, 'a.setEncounters(false)');
-    const folk = (await hook(t, 'npcs')).filter((n) => n.zone === startZone), bad = []; let pages = 0;
+    const folk = await hook(t, 'npcs'), bad = []; let pages = 0;
     for (const n of folk) { await press(t, n);
       for (let i = 0; i < 40; i++) { const st = await t.state(); if (!st.dialogue) break; pages++; bad.push(...(await layout(t, `${n.name} page ${i + 1}`))); await t.A(60); }
       await setup(t, 'T.shut()'); }
     t.must(pages >= folk.length, `only ${pages} pages from ${folk.length} people`);
     t.must(!bad.length, bad.slice(0, 3).join(' | '));
     return `${folk.length} people, ${pages} pages`;
-  });
+  }, { timeout: 300000 });
 
   suite.test('ui.layout.battle', 'layout: the battle screen is drawn clean at the start, after two rounds and at its end, also for the longest creature names', async (t) => {
     await t.play(); const bad = [], long = [...D.monsters].sort((a, b) => b.name.length - a.name.length).slice(0, 4);

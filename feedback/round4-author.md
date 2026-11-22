@@ -20,5 +20,6 @@ Goes into round 4 together with REVIEW-v0.5.md's proposed round 4 (author approv
 11. (added) It should be clear how buying things (a dagger?) changes the AC or damage, etc.
 12. (added) We need a bed in the main town where you can rest for free.
 13. (added) The status bar should only show on the normal map view; not in battles (nor on the title).
+14. (added) After a defeat you sometimes wake up in a different town. That's unexpected. (Plan: always wake in Brindlemere, in the hero's house next to the free bed, unless a crypt/house loss keeps you at that door for a retry; the dialogue names the place.)
 
 Positive (keep as is): the defeat outcomes ("deaths are now great").
