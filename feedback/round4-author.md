@@ -15,3 +15,4 @@ Verbatim (numbering as written):
 8. All houses should be accessible.
 
 Goes into round 4 together with REVIEW-v0.5.md's proposed round 4 (author approved both, 22 Nov).
+9. (added) Narration in the battles should be better.

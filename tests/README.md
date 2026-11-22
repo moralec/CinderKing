@@ -8,8 +8,8 @@ engine can still run another world from data.
 ## Run
 
 ```
-node tests/run.mjs                       # the game in ../game, every part (about 25 minutes with the engine check)
-node tests/run.mjs <game dir> --fast     # without the 10-minute engine check, 120 fights a boss (about 6 minutes)
+node tests/run.mjs                       # the game in ../game, every part (about 17 minutes, 9 of them the engine check)
+node tests/run.mjs <game dir> --fast     # without the engine check, 120 fights a boss (about 6 minutes)
 node tests/run.mjs <game dir> --only story,ui
 node tests/run.mjs <game dir> --only ui.items --must ui.items     # the gate of the step that builds the Items page
 node tests/run.mjs <game dir> --strict   # the gate of a finished round: nothing may fail, expected or not
@@ -19,6 +19,8 @@ node tests/run.mjs --list                # every test, with the ones expected to
 It needs Node 22 or newer and Chromium (`/usr/bin/chromium`, or the env `Q1_CHROMIUM`). Nothing else: the runner serves the folder
 itself on a free local port and closes the browser when it ends. Other options: `--skip id,id`, `--fights N` (default 400),
 `--json FILE` (every result, with the balance table), `--shots DIR` (a screenshot when a test fails), `--checker DIR`.
+On a machine that suspends when idle, hold a sleep inhibitor for a full run (`systemd-inhibit --what=idle:sleep node tests/run.mjs ...`):
+a suspend in the middle closes the browser and fails the test that was running.
 
 One line a test: `PASS`, `FAIL`, `XFAIL` (it fails, and `expected-failures.json` says why and which step fixes it), `XPASS` (listed
 there but it passes now: remove the entry) or `SKIP`. The exit code is 0 when nothing failed unexpectedly. The last line is
@@ -62,8 +64,10 @@ driver), `adapter.mjs`, `gate.mjs` and `replay-rpg.mjs` (the build kit's rounds 
   the screen); A sells for half the price.
 - **Rest:** A through an innkeeper's talk restores all HP (a fee is allowed; the answer defaults to yes). The bed in the house is
   `window.__game.landmarks.bed`.
-- **Battle:** START drinks or opens a list of the bag (A takes the row). A drink costs the turn. B can fail; never works on a
-  story boss.
+- **Battle:** START drinks or opens a list of the bag (A takes the row). A drink costs the turn. B can fail, often enough to be
+  seen in 30 tries and not always (a chance between about 15 % and 85 %); it never works on a story boss.
+- **Saves:** the hook's `save()` and `load()` stay quick and ask nothing: the simulation loads a save before each of its fights.
+  After the ending the game keeps the won state, so that Continue on the title returns to it.
 - **Ending:** the end card comes after the last line and stays; START rolls the credits (A turns pages); then the title, where
   START on `Continue` returns to the won game.
 - **Title:** with a save, `Continue` is the entry START takes.
@@ -85,7 +89,8 @@ main quests and their bosses only (no side quests, no grinding), wearing the sto
 - *Above 85 %* the boss is not a boss. In v0.5 the chapter 7 boss was won 100 % of the time.
 - *No potions* is the number that is checked, because it does not depend on how a drink works. The rate with 3 Potions of Healing
   (drunk at 35 % HP or less) is reported beside it: it shows what preparation buys.
-- At 400 fights the number moves about 2.5 points from run to run. Aim a boss at 50-75 %, not at the edge of the band.
+- At 400 fights the number moves about 2.5 points from run to run (about 4.5 with `--fast`). Aim a boss at 50-75 %, not at
+  the edge of the band.
 - The hero is the game's own when a new game always gives the same one. While the game still rolls a new hero each time, the
   simulation uses the review's typical roll (STR 12, DEX 14, CON 11) so that runs can be compared.
 
