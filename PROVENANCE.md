@@ -28,7 +28,7 @@ bigger GPU.) Rows marked *code* must all be Local.
 | Game code, feedback round 1 (dialogue paging, battle layout, shop rows) | Qwen3.6-35B-A3B, from 5 fix steps written by Fable ($3.63) | **Code local**, plan cloud | 22 Nov 00:11 | LocalAI runs/R4F: checker 25/25, visual 7; tag v0.4 |
 | Local planning attempt (two local plans) | Qwen3.6-35B-A3B | Local | 22 Nov | not built: blind review predicted 1-8/25; local planning paused until a bigger GPU |
 | Story direction (outline, structure) | Claude research agent, approved by the operator ("story is solid") | **Cloud** (direction, like feedback) | 22 Nov | story/STORY-RESEARCH.md |
-| In-game story text (dialogue, quest lines, world.json changes) | (planned: Qwen3.6-35B writes it from the approved outline in feedback round 1) | Local | — | runs/R4LF1/ |
+| In-game story text (dialogue, quest lines, world.json changes) | written by Claude (Fable) in the round-2 plan, applied by Qwen3.6-35B as data steps; story kept inside the existing quest shapes (the full outline's new steps are parked: the R4 checker pins quest shapes) | **Cloud** text (hybrid), local edits | 22 Nov | LocalAI plans/r4-fix2/assets/world/, runs/R4F2 |
 | Fix rounds from the operator's feedback | (planned: feedback by the operator, fix plans and code by Qwen3.6-35B) | Human + Local | — | runs/R4LF<n>/feedback.md, planner.json |
 | Box cover art | Gemini 3.1 Flash Image via OpenRouter ($0.07) | **Cloud** | 22 Nov | story/art/ (credit it, or replace with a local image model later) |
 | Back-cover text | Claude (the coordinator session) | **Cloud** | 22 Nov | story/BACK-COVER.md |
