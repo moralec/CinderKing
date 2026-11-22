@@ -15,7 +15,7 @@ import { ADAPTER, BOOTED } from './adapter.mjs';
 
 /** the keys of the game (README of the game: arrows move, Space or Z is A, Escape or X is B, Enter is START) */
 export const KEY = { A: 'Space', B: 'Escape', START: 'Enter', up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' };
-export const VIEW = { w: 256, h: 192, map: 144 };   // the canvas; the map view is its top 144 rows, the status strip the rest
+export const VIEW = { w: 256, h: 192, map: 144, box: 140 };   // the canvas; the map view is its top 144 rows, the status strip the rest
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png',
@@ -61,8 +61,14 @@ const HELPERS = `window.T = {
     return bad; },
   offscreen() { const W = window.game.scale.width, H = window.game.scale.height;
     return T.texts().filter(a => a.scene === 'UI' && (a.x < 0 || a.y < 0 || a.x + a.w > W || a.y + a.h > H)).map(a => JSON.stringify(a.text.slice(0, 24)) + ' at ' + a.x + ',' + a.y + ' size ' + a.w + 'x' + a.h); },
-  // texts of the view (y < 144) that run down into the status strip
-  spills() { return T.texts().filter(a => a.scene === 'UI' && a.y < ${VIEW.map} && a.y + a.h > ${VIEW.map} + 1).map(a => JSON.stringify(a.text.slice(0, 24)) + ' ends at y ' + (a.y + a.h)); },
+  // texts of the view that run below the text area: every box of the view (dialogue, menu, shop, battle log) ends at y ${VIEW.box}
+  spills() { return T.texts().filter(a => a.scene === 'UI' && a.y < ${VIEW.map} && a.y + a.h > ${VIEW.box} + 1).map(a => JSON.stringify(a.text.slice(0, 24)) + ' ends at y ' + (a.y + a.h) + ', below its box'); },
+  // the pictures drawn right now: [{ scene, key, frame, x, y, w, h, scale, depth }] (x, y = the top left corner on the canvas of its scene)
+  sprites() { const out = [], walk = (o, key, depth) => { if (!o.visible || o.alpha === 0) return;
+      if (o.type === 'Container') { for (const c of o.list) walk(c, key, o.depth); return; }
+      if (o.type === 'Sprite' || o.type === 'Image') { const b = o.getBounds(); out.push({ scene: key, key: o.texture.key, frame: o.frame.name, x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height), cx: o.x, cy: o.y, scale: o.scaleX, depth: depth ?? o.depth }); } };
+    for (const s of T.scenes()) for (const o of s.children.list) walk(o, s.sys.settings.key);
+    return out; },
   // the title is up when a drawn line is exactly one of its entries (the game need not expose anything)
   onTitle() { return T.lines().some(l => /^(press start|continue|new game)$/.test(l.replace(/^\\s*>\\s*/, '').replace(/\\s+/g, ' ').trim().toLowerCase())) ||
     T.texts().some(t => /^press\\s+start$/i.test(t.text.trim())); },
@@ -173,7 +179,7 @@ export class Session {
         if (!ok) throw new Error('the game did not start within 10 s' + (s.errors().length ? '; page errors: ' + short(s.errors()) : '; no page error: is a script tag missing or out of order?'));
         await D.wait(200); await D.evaluate(s.page, ADAPTER); await D.evaluate(s.page, HELPERS); },
       /** a new game, past the title as a player gets past it: START until the title is gone */
-      async play(opts) { await t.open(opts); await t.pastTitle(); },
+      async play(opts) { await t.open(opts); await t.pastTitle(); await t.readAll(); },   // readAll: an intro told in dialogue pages
       async pastTitle() { for (let i = 0; i < 4 && (await t.ev('T.onTitle()')); i++) { await t.START(); await sleep(150); }
         if (await t.ev('T.onTitle()')) throw new Error('START does not leave the title screen');
         await t.ev('T.idle()'); },
@@ -209,6 +215,17 @@ export class Session {
         return pages; },
       // ---- pictures ----
       shot: (file) => D.screenshot(s.page, file),
+      /** one screenshot: at(x, y) = the colour [r, g, b] of canvas pixel x, y (the canvas is 256 x 192) */
+      async grab() {
+        const r = await D.evaluate(s.page, `(() => { const b = document.querySelector('canvas').getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; })()`);
+        const img = decodePng(await D.screenshot(s.page)), k = r.w / VIEW.w;
+        return { at(x, y) { const sx = Math.min(img.w - 1, Math.floor(r.x + (x + 0.5) * k)), sy = Math.min(img.h - 1, Math.floor(r.y + (y + 0.5) * k)), o = (sy * img.w + sx) * img.bpp; return [img.px[o], img.px[o + 1], img.px[o + 2]]; } }; },
+      /** the share of canvas pixels of a box [x, y, w, h] for which test([r, g, b]) holds */
+      async share(box, test) { const g = await t.grab(), [x0, y0, w, h] = box; let n = 0, k = 0;
+        for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) { k++; if (test(g.at(x, y))) n++; } return k ? n / k : 0; },
+      /** the share of pixels of a box that change between two screenshots ms apart */
+      async motion(box, ms = 400) { const a = await t.grab(); await sleep(ms); const b = await t.grab(), [x0, y0, w, h] = box; let n = 0, k = 0;
+        for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) { k++; const p = a.at(x, y), q = b.at(x, y); if (Math.abs(p[0] - q[0]) + Math.abs(p[1] - q[1]) + Math.abs(p[2] - q[2]) > 24) n++; } return k ? n / k : 0; },
       /** colour make-up of a part of the canvas (fractions 0..1): hist = 512 shares, flat = the largest, distinct = colours over 0.2 %, sd = spread of brightness */
       async signature(x0 = 0, y0 = 0, x1 = 1, y1 = 1) {
         const r = await D.evaluate(s.page, `(() => { const c = document.querySelector('canvas'); if (!c) return null; const b = c.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; })()`);
