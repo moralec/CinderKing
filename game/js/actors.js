@@ -5,7 +5,7 @@ const ACTORS = [
     if (s === 0) { Bag.add(DRAUGHT); Quest.set(1); say(['Elder Maren: The dead do not rest. A bell tolls under Thornwood every night.',
       'Find Brother Tobin at the cemetery, east through the gate. Take this.', `Quest: The Restless Crypt. You got a ${DRAUGHT}.`]); }
     else if (s === 5) { Bag.drop(BELL); Bag.add(CHARM); Quest.set(6); say(["Elder Maren: The Gravecaller's bell! Then it is over. Thank you.",
-      `Quest complete! You gain 60 XP and the ${CHARM}.`, ...Rules.grantXp(60)]); }
+      `Quest complete! You got the ${CHARM}.`]); }
     else say([s < 5 ? 'Elder Maren: Brother Tobin keeps the cemetery in Thornwood. Go east.' : 'Elder Maren: The nights are quiet again. Rest well.']); } },
   { ...SPOT.helper, f: () => 98, talk() { give('hale', ['Hale: Beasts hide in the tall grass of Thornwood.', 'Take this. Press START in a fight to drink it.']) ||
     say(['Hale: Keep to the path and you keep your boots.']); } },

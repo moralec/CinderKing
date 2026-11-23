@@ -45,7 +45,7 @@ wrap(Battle, 'start', old => (who, more) => {
   old(boss ? who : undefined);
 
   const enemy = Fight.enemy(monster, boss ? { name: step.as, boss: 1 } : more);
-  Object.assign(G.battle, { enemy, enemyRoll: null, lastRoll: null, log: [enemy.name + ' attacks!'] });
+  Object.assign(G.battle, { enemy, enemyRoll: null, lastRoll: null, log: [enemy.name.charAt(0).toUpperCase() + enemy.name.slice(1) + ' attacks!'] });
   Battle.onChange();
   return true;
 });

@@ -157,13 +157,15 @@ export default function (suite, { data: D }) {
     const r = await t.ev(`(() => { const g = window.__game, out = { npcs: g.npcs.map(n => ({ id: n.id, zone: n.zone, map: n.map, x: n.x, y: n.y })), steps: [], zones: g.world.zones.map(z => ({ id: z.id, map: z.map })) };
       for (const kind of ['main', 'side']) for (const q of g.quests[kind]) q.steps.forEach((s, k) => out.steps.push({ q: q.id, k, type: s.type, at: s.at || null })); return out; })()`);
     const bad = [], mapOf = Object.fromEntries(r.zones.map((z) => [z.id, z.map])), at = new Map();
+    const homes = (zone) => new Set([mapOf[zone], ...(W.sites || []).filter((x) => x.zone === zone).map((x) => x.id)]);   // a zone's map and the rooms of its sites
     for (const n of W.npcs) { const p = r.npcs.find((x) => x.id === n.id);
       if (!p || p.map == null) { bad.push(`${n.id} is not in the game`); continue; }
-      if (p.map !== mapOf[n.zone]) bad.push(`${n.id} stands on ${p.map}, not in ${n.zone}`); }
+      if (!homes(n.zone).has(p.map)) bad.push(`${n.id} stands on ${p.map}, not in ${n.zone} or a house of it`); }
     for (const q of D.quests) q.steps.forEach((s, k) => { const p = r.steps.find((x) => x.q === q.id && x.k === k);
       if (!p || !p.at || p.at.map == null) { bad.push(`${q.id} step ${k + 1} (${s.type}) has no place`); return; }
       const want = s.site || mapOf[s.type === 'talk' ? (npc[s.npc] || {}).zone : s.zone];
-      if (p.at.map !== want) bad.push(`${q.id} step ${k + 1} is on ${p.at.map}, wanted ${want}`);
+      const ok = s.type === 'talk' && !s.site ? homes((npc[s.npc] || {}).zone).has(p.at.map) : p.at.map === want;
+      if (!ok) bad.push(`${q.id} step ${k + 1} is on ${p.at.map}, wanted ${want}`);
       if (s.type !== 'talk') { const key = `${p.at.map} ${p.at.x},${p.at.y}`; if (at.has(key) && at.get(key) !== `${q.id}#${k}`) bad.push(`${q.id} step ${k + 1} shares the tile ${key} with ${at.get(key)}`); at.set(key, `${q.id}#${k}`); } });
     const seen = new Map(); for (const p of r.npcs) { const key = `${p.map} ${p.x},${p.y}`; if (seen.has(key)) bad.push(`${p.id} and ${seen.get(key)} share the tile ${key}`); seen.set(key, p.id); if (at.has(key)) bad.push(`${p.id} stands on the tile of ${at.get(key)}`); }
     t.must(!bad.length, list(bad));

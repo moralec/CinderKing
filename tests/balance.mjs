@@ -24,7 +24,7 @@ const SIM = `window.SIM = async (n, potion) => { const g = window.__game, a = g.
     for (let k = 0; k < 6000; k++) { if (g.dialogueOpen) { a.pressA(); continue; }
       const b = g.battle; if (!b || !b.active) { if (!TA.idle()) { await T.sleep(5); continue; } break; }
       const h = g.party[0];
-      if (potion && left > 0 && h.hp <= h.maxHp * 0.35 && a.useItem(potion)) { left--; drinks++; continue; }
+      if (potion && left > 0 && h.hp <= h.maxHp * 0.35 && a.useItem(potion)) { left--; drinks++; if (!g.battle || !g.battle.active) { res = g.battle ? g.battle.result : null; break; } continue; }
       a.pressA(); rounds++; if (!g.battle || !g.battle.active) { res = g.battle ? g.battle.result : null; break; } }
     if (res === 'win') wins++; else if (res !== 'lose') odd++; }
   return { n, wins, pct: Math.round(1000 * wins / n) / 10, rounds: Math.round(10 * rounds / n) / 10, drinks: Math.round(10 * drinks / n) / 10, odd }; }`;

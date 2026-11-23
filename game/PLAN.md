@@ -68,3 +68,23 @@
 - [x] 70 js/nobuttons.js: no drawn buttons in the strip; touch zones and keys work
 - [x] 71 js/statusbar.js: status bar with zone, HP bar, level, gold, and hint
 - [x] 72 PLAN.md: the gate; all 63 tests pass
+- [x] 80 js/modes.js: one input router with a mode stack; the screen that is open takes the keys
+- [x] 81 js/fit.js: one rule for fitting text: Fit.rows, Fit.cut, Fit.name, Fit.pages
+- [x] 82 js/menupages.js: the pages of the Start menu are a registry: Pages[entry] = { text(old), a() }
+- [x] 83 js/packrows.js: Pack: what the hero wears and carries as rows; what A does with a row
+- [x] 84 js/packpage.js: the Items page: worn gear and the bag as one list with a cursor
+- [x] 85 js/partypage.js: the Party page also shows the attack of the weapon in hand
+- [x] 86 js/statusbar.js: the status bar belongs to the map: Hud.on(); hidden while the battle screen is up
+- [x] 87 js/battleview.js: the battle screen, layout A: the whole canvas, four boxes, a command list, a telling box
+- [x] 88 js/swing.js: a turn each (Battle.heroTurn, Battle.foeTurn); the roll told as one line
+- [x] 89 js/battlecmd.js: the command menu of a battle: the arrows move the cursor, A does the command
+- [x] 90 js/battleitems.js: Item in a battle: the drinks of the bag as a list in the telling box
+- [x] 91 data/world.json: the rules of round 4 (meta.rules), the hero of the game (meta.start.hero), a bed in every settlement
+- [x] 92 js/battlerules.js: Run can fail, a story boss cannot be run from, a drink from the list takes the turn
+- [x] 93 js/rest.js: a person with a `rest` field gives a bed: all HP back for a fee
+- [x] 94 js/herofix.js: the hero of the data, the same in every new game; hit points by data/srd/rules.json
+- [x] 95 js/foescale.js: a quest foe may have numbers of its own: the `foe` field of its defeat step
+- [x] 96 js/spoils.js: a won fight pays gold: the monster's XP times meta.rules.gold
+- [x] 97 data/world.json: the bosses a hero can beat, the Pale Lady's reward, no giant frog in the village grass
+- [x] 98 js/actors.js: chapter 1 pays its reward once
+- [x] 99 PLAN.md: the gate of round 4a: PLAN.md, and the whole suite of the game with this round's tests passing

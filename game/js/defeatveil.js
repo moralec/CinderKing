@@ -3,7 +3,7 @@
 Defeat.dark = false
 
 UI_BUILD.push(ui => {
-  veil = ui.add.rectangle(0, 0, 256, 144, 0x101018).setOrigin(0).setDepth(9).setVisible(false)
+  veil = ui.add.rectangle(0, 0, 256, 192, 0x101018).setOrigin(0).setDepth(9).setVisible(false)
   Defeat.veil = veil
   ui.events.on('update', () => {
     if (Defeat.dark && !G.dialogueOpen) {

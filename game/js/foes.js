@@ -4,7 +4,7 @@ const FOES = { forest:[ { name:'Moss Rat', frame:123, hp:5, ac:10, atk:2, die:4,
 const BOSS = { name:'Gravecaller', frame:111, hp:26, ac:13, atk:4, die:8, xp:60, boss:1 };
 const B2 = { start:Battle.start, strike:Battle.strike, attack:Battle.attack, end:Battle.end, grass:Rules.isGrass, pressStart:Ctl.pressStart };
 Rules.isGrass = (x, y) => !G.calm && B2.grass(x, y);
-Battle.start = foe => { B2.start(); const z = FOES[G.map], m = foe || (z && z[roll(z.length) - 1]); if (!m) return;
+Battle.start = foe => { B2.start(); const z = FOES[G.map], m = (foe === true) ? BOSS : (foe || (z && z[roll(z.length) - 1])); if (!m) return;
   Object.assign(G.battle, { enemy:{ ...m, maxHp:m.hp }, log:[m.boss ? 'The Gravecaller attacks!' : `A ${m.name} creeps out!`] });
   Battle.onChange(); };
 Battle.strike = (who, bonus, ac, die, dmgMod) => who !== 'You' ? B2.strike(who, bonus, ac, die, dmgMod)

@@ -333,7 +333,8 @@ export default function (suite, { data: D }) {
     const s1 = await t.state(), n1 = await hook(t, 'inventory.length');
     const price = [s1.gold < s0.gold && `${s0.gold - s1.gold} gp`, n1 < n0 && `${n0 - n1} things`, s1.hp < s1.maxHp && `HP ${s1.hp}/${s1.maxHp}`].filter(Boolean);
     t.must(price.length, `the defeat cost nothing: gold ${s0.gold} -> ${s1.gold}, HP ${s1.hp}/${s1.maxHp}, the bag as it was; it said ${JSON.stringify(told.slice(-1)[0] || '')}. Losing is the best healing in the game`);
-    t.must(safe.has(s1.map), `the hero wakes on ${s1.map} at ${s1.x},${s1.y}, where he fell (${s0.map}); that is not a settlement`);
+    const homes = new Set((W.sites || []).filter((x) => safe.has((zones.find((z) => z.id === x.zone) || {}).map)).map((x) => x.id));   // the houses of the settlements
+    t.must(safe.has(s1.map) || homes.has(s1.map), `the hero wakes on ${s1.map} at ${s1.x},${s1.y}, where he fell (${s0.map}); that is neither a settlement nor a house of one`);
     t.must(!s1.battle && s1.idle, 'after the defeat the game does not take input');
     t.must(!unfit.length, unfit.slice(0, 2).join(' | '));
     return `cost ${price.join(', ')}; woke on ${s1.map}`;

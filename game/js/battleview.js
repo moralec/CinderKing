@@ -1,37 +1,71 @@
-// js/battleview.js - battle screen in the 256x144 view
+// js/battleview.js - battle screen, layout A: whole canvas, four boxes, command list, telling box
 const BattleView = {
   panels: {},
-  build(ui) { const V = BattleView, g = ui.add.graphics(), C = (x, y, s) => txt(ui, x, y, s).setOrigin(0.5);
-    V.panels = { foe: [4, 4, 140, 36], me: [48, 46, 140, 36],
-      dice: [[12, 86, 22, 18], [40, 86, 22, 18], [194, 86, 22, 18], [222, 86, 22, 18]],
-      log: [4, 115, 248, 27] };
-    g.fillStyle(0xb8d890).fillRect(0, 0, 256, 144).fillStyle(0x587058).fillEllipse(216, 48, 60, 8).fillEllipse(28, 78, 40, 8);
-    panel(g, ...V.panels.foe); panel(g, ...V.panels.me);
-    for (const p of V.panels.dice) panel(g, ...p);
-    panel(g, ...V.panels.log);
+  cmds: ['Attack', 'Item', 'Run'],
+  build(ui) {
+    const V = BattleView;
+    V.panels = {
+      foe: [4, 4, 140, 28],
+      me: [64, 96, 108, 28],
+      menu: [176, 88, 76, 50],
+      log: [4, 142, 248, 48]
+    };
+    // Ground: 0xb8d890 over 0, 0, 256, 192
+    V.back = ui.add.graphics();
+    V.back.fillStyle(0xb8d890).fillRect(0, 0, 256, 192);
+    // Shadows
+    V.back.fillStyle(0x587058);
+    V.back.fillEllipse(212, 80, 56, 8);
+    V.back.fillEllipse(28, 120, 36, 8);
+
+    // Four boxes drawn with panel()
+    V.frames = ui.add.graphics();
+    panel(V.frames, ...V.panels.foe);
+    panel(V.frames, ...V.panels.me);
+    panel(V.frames, ...V.panels.menu);
+    panel(V.frames, ...V.panels.log);
+
+    // Dark HP bars
     V.bars = ui.add.graphics();
-    V.foe = ui.add.sprite(216, 26, 'dun', 108).setScale(3); V.me = ui.add.sprite(28, 62, 'dun', 88).setScale(2);
-    V.foeTxt = txt(ui, 10, 9, ''); V.meTxt = txt(ui, 54, 51, '');
-    V.log = ui.add.text(8, 119, '', { ...FONT, color: '#203020', lineSpacing: 4 });
-    V.d20 = C(23, 95, '?'); V.dmg = C(51, 95, '-');
-    V.foeD20 = C(205, 95, '?'); V.foeDmg = C(233, 95, '-');
-    V.foeD20Lbl = C(205, 109, 'd20'); V.foeDmgLbl = C(233, 109, 'd8');
-    V.d20Lbl = C(23, 109, 'd20'); V.dmgLbl = C(51, 109, 'd8');
-    const hint = txt(ui, 128, 95, 'A Attack  B Run', '#587058').setOrigin(0.5);
-    V.hint = hint;
-    V.box = ui.add.container(0, 0, [g, V.bars, V.foe, V.me, V.foeTxt, V.meTxt, V.log, V.d20, V.dmg, V.foeD20, V.foeDmg, V.foeD20Lbl, V.foeDmgLbl, V.d20Lbl, V.dmgLbl, hint])
-      .setDepth(7).setVisible(false); },
-  refresh() { const V = BattleView, b = G.battle;
+    V.bars.fillStyle(0x203020).fillRect(10, 21, 84, 4).fillRect(70, 113, 36, 4);
+
+    // Foe sprite: at 212, 80, scale 3, origin 0.5, 1 (feet on y 80)
+    V.foe = ui.add.sprite(212, 80, 'dun', 108).setScale(3).setOrigin(0.5, 1);
+    // Hero sprite: 'dun' frame 88, at 28, 120, scale 2, origin 0.5, 1
+    V.me = ui.add.sprite(28, 120, 'dun', 88).setScale(2).setOrigin(0.5, 1);
+
+    // Texts
+    V.foeTxt = txt(ui, 10, 9, '');
+    V.foeAc = txt(ui, 138, 19, '').setOrigin(1, 0);
+    V.meTxt = txt(ui, 70, 101, '');
+    V.meHp = txt(ui, 166, 111, '').setOrigin(1, 0);
+    V.cmd = ui.add.text(182, 94, '', { ...FONT, color: '#203020', lineSpacing: 6 }).setOrigin(0, 0);
+    V.log = ui.add.text(12, 148, '', { ...FONT, color: '#203020', lineSpacing: 2 });
+
+    V.box = ui.add.container(0, 0, [V.back, V.frames, V.bars, V.foe, V.me, V.foeTxt, V.foeAc, V.meTxt, V.meHp, V.cmd, V.log])
+      .setDepth(7).setVisible(false);
+  },
+  rows() {
+    return Fit.rows(G.battle.log.slice(-6).join('\n'), 29).slice(-4);
+  },
+  refresh() {
+    const V = BattleView, b = G.battle;
     V.box.setVisible(!!b); if (!b) return;
     const e = b.enemy, h = G.hero;
     V.foe.setFrame(e.frame);
-    V.foeTxt.setText(`${String(e.name).slice(0, 16)}\nHP ${e.hp}/${e.maxHp} AC ${e.ac}`);
-    V.meTxt.setText(`${h.name} Lv ${h.level}\nHP ${h.hp}/${h.maxHp} AC ${Rules.ac(h)}`);
-    V.d20.setText(b.lastRoll ? String(b.lastRoll.value) : '?'); V.dmg.setText(b.lastDmg != null ? String(b.lastDmg) : '-');
-    V.foeD20.setText(b.foeRoll ? String(b.foeRoll.value) : '?'); V.foeDmg.setText(b.foeDmg != null ? String(b.foeDmg) : '-');
-    V.log.setText(b.log.slice(-2).map(l => l.slice(0, 30)).join('\n'));
-    V.bars.clear().fillStyle(0x203020).fillRect(10, 32, 128, 4).fillRect(54, 74, 128, 4)
-      .fillStyle(0x58a048).fillRect(10, 32, 128 * Math.max(0,e.hp) / e.maxHp, 4).fillRect(54, 74, 128 * Math.max(0,h.hp) / h.maxHp, 4); } };
+    V.foeTxt.setText(e.short || Fit.name(e.name, 16));
+    V.foeAc.setText('AC ' + e.ac);
+    V.meTxt.setText(h.name + ' Lv ' + h.level);
+    V.meHp.setText(h.hp + '/' + h.maxHp);
+    const ci = G.battle.cmd || 0;
+    V.cmd.setText(V.cmds.map((c, i) => (i === ci ? '>' : ' ') + c).join('\n'));
+    V.log.setText(V.rows().join('\n'));
+    const ehp = Math.max(0, e.hp) / e.maxHp, hhp = Math.max(0, h.hp) / h.maxHp;
+    V.bars.clear().fillStyle(0x203020).fillRect(10, 21, 84, 4).fillRect(70, 113, 36, 4)
+      .fillStyle(0x58a048).fillRect(10, 21, 84 * ehp, 4).fillRect(70, 113, 36 * hhp, 4);
+  },
+  hide() { BattleView.box.setVisible(false); }
+};
 UI_BUILD.push(ui => BattleView.build(ui));
 Battle.onChange = () => BattleView.refresh();
 BattleView.hide = () => { BattleView.box.setVisible(false); };

@@ -22,7 +22,7 @@ const Battle = {
     Battle.onChange(); },
   flee() { Battle.end('fled'); },
   end(result) { const b = G.battle, h = G.hero, e = b.enemy; let msgs;
-    if (result === 'win') msgs = [`${e.name} is defeated! You gain ${e.xp} XP.`, ...Rules.grantXp(e.xp)];
+    if (result === 'win') msgs = [`${e.name.charAt(0).toUpperCase() + e.name.slice(1)} is defeated! You gain ${e.xp} XP.`, ...Rules.grantXp(e.xp)];
     else if (result === 'lose') { h.hp = h.maxHp; msgs = ['You fall... Orwyn carries you out of the grass. HP restored.']; }
     else msgs = ['You slip away through the tall grass.'];
     b.log.push(...msgs); b.result = result; b.active = false;

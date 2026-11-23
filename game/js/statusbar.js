@@ -1,6 +1,7 @@
 // js/statusbar.js — the strip is a status bar: zone, HP bar, level/gold, hint
 
 Hud.box = [136, 166, 112, 8];
+Hud.on = () => !BattleView.box.visible;
 Hud.place = () => {
   const z = zoneOf(G.map);
   const site = DB.world.sites.find(s => s.id === G.map);
@@ -32,7 +33,9 @@ UI_BUILD.push(ui => {
     }
     if (G.menuOpen && !fading) {
       fading = true;
-      ui.tweens.add({ targets: Hud.hint, alpha: 0, duration: 400, onComplete: () => Hud.hint.setVisible(false) });
+      ui.tweens.add({ targets: Hud.hint, alpha: 0, duration: 400 });
     }
+    const on = Hud.on();
+    for (const o of [Hud.zone, Hud.bar, Hud.hint, ui.hpLine, ui.counter]) o.setVisible(on);
   });
 });

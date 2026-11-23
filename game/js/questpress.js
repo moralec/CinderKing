@@ -11,7 +11,7 @@ Tales.press = (q, k) => {
   }
 
   if (step.type === 'defeat') {
-    Battle.start(step.monster, { name: step.as, onWin: () => say([...uiScene().pages, ...Tales.finish(q, k)]) });
+    Battle.start(step.monster, { name: step.as, onWin: () => say([...uiScene().pages, ...Tales.finish(q, k)]), boss: DB.world.quests.main.includes(q) ? 1 : 0 });
     return;
   }
 
