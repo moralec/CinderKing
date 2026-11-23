@@ -3,7 +3,7 @@
 //
 // The keys: arrows, Space = A, Escape = B, Enter = START. What a list must look like for these tests to drive it:
 // the row under the cursor starts with '>' (as the Start menu and the shop already do), ArrowUp/ArrowDown move it.
-import { KEY, sleep } from './lib/harness.mjs';
+import { KEY, sleep, sigDist } from './lib/harness.mjs';
 import { offersRest, isSettlement } from './data.mjs';
 import { helpers } from './lib/gate.mjs';
 
@@ -33,10 +33,18 @@ async function itemsList(t, names) {
   const marked = await t.ev('T.marked()');
   t.must(marked.some((m) => names.some((n) => row(n).test(m))), `A on "Items" puts no cursor ('>') on a row of the bag; rows under a cursor: ${JSON.stringify(marked)}`);
 }
-/** in a battle: drink with the keys. START drinks at once or opens a list of the bag; A takes the row under the cursor. */
+/** does the battle show the command menu of layout A (Attack / Item / Run with a cursor)? */
+const hasMenu = (t) => t.ev(`T.marked().length > 0 && ['Attack', 'Item', 'Run'].every(w => T.lines().some(l => new RegExp('^\\\\s*[>▶►]?\\\\s*' + w + '\\\\b', 'i').test(l)))`);
+/** a battle command with the keys: on the command menu, the cursor to the word and A; on the old screen, the old key */
+async function cmd(t, word, oldKey) {
+  if (!(await hasMenu(t))) { await t.key(oldKey, 45, 150); return false; }
+  if (!(await t.cursorTo(new RegExp('^' + word + '\\b', 'i'), { max: 4 }))) throw new Error(`the battle menu's cursor never reaches "${word}"`);
+  await t.A(180); return true;
+}
+/** in a battle: drink with the keys. Item on the command menu opens the list of the bag, A takes the row. (Old screen: START.) */
 async function drink(t, name) {
   const n0 = await t.ev(`window.__game.inventory.length`);
-  await t.START(200);
+  await cmd(t, 'Item', KEY.START);
   if ((await t.ev(`window.__game.inventory.length`)) < n0) return true;
   if (name && (await t.cursorTo(row(name), { max: 12 }))) { await t.A(200); if ((await t.ev(`window.__game.inventory.length`)) < n0) return true; }
   return false;
@@ -260,7 +268,7 @@ export default function (suite, { data: D }) {
   const fight = async (t, id, level = 5) => { await setup(t, `a.setEncounters(false); a.grantXp(${D.rules.level_xp[level - 1]}); T.shut()`);
     t.must(await hook(t, `actions.forceBattle(${JSON.stringify(id)})`), `set-up: forceBattle(${id}) returned false`); await sleep(150); };
 
-  suite.test('ui.battle.potion', 'battle: a Potion of Healing can be drunk with the keys (START, then A on its row if a list opens)', async (t) => {
+  suite.test('ui.battle.potion', 'battle: a Potion of Healing can be drunk with the keys (Item on the command menu, then A on its row)', async (t) => {
     await t.play(); await setup(t, `a.addItem('potion-of-healing'); a.addItem('potion-of-healing')`);
     const name = D.item['potion-of-healing'].name;
     await fight(t, weak.id); await t.ev('TA.setHp(3)');
@@ -285,13 +293,13 @@ export default function (suite, { data: D }) {
     return `${drunk} drinks`;
   });
 
-  suite.test('ui.flee.fails', 'battle: B (run) can fail: over 30 tries some fail and some get away', async (t) => {
+  suite.test('ui.flee.fails', 'battle: Run can fail: over 30 tries some fail and some get away', async (t) => {
     await t.play(); await setup(t, 'a.setEncounters(false)'); await setup(t, `a.grantXp(${D.rules.level_xp[4]}); T.shut()`);
     let fled = 0, failed = 0;
     for (let i = 0; i < 30 && !(fled && failed); i++) {
       await t.ev('TA.setHp(T.hero().maxHp)');
       t.must(await hook(t, `actions.forceBattle(${JSON.stringify(weak.id)})`), 'set-up: forceBattle returned false'); await sleep(60);
-      await t.B(120);
+      await cmd(t, 'Run', KEY.B); await t.readAll();
       const st = await t.state(); if (st.battle) failed++; else if (st.result === 'fled') fled++; else if (st.result === 'lose') failed++;
       await setup(t, 'T.shut()'); await t.ev('T.idle()');
     }
@@ -299,14 +307,14 @@ export default function (suite, { data: D }) {
     return `${fled} away, ${failed} failed`;
   }, { timeout: 180000 });
 
-  suite.test('ui.flee.boss', 'battle: there is no running from a story boss (B five times, the fight goes on)', async (t) => {
+  suite.test('ui.flee.boss', 'battle: there is no running from a story boss (Run five times, the fight goes on)', async (t) => {
     await t.play(); await setup(t, 'a.setEncounters(false)');
     const q = W.quests.main[0], k = q.steps.findIndex((s) => s.type === 'defeat');
     await t.ev(`T.hookPlay('main', 0, ${k})`);
     await press(t, await t.ev(`T.quest('main', 0).steps[${k}].at`)); await t.readAll();
     t.must((await t.state()).battle, `set-up: A on ${q.steps[k].as} started no battle`);
     await t.ev('TA.setHp(99999)');
-    for (let i = 0; i < 5; i++) { await t.B(150); await t.readAll(); if (!(await t.state()).battle) break; }
+    for (let i = 0; i < 5; i++) { await cmd(t, 'Run', KEY.B); await t.readAll(); if (!(await t.state()).battle) break; }
     const st = await t.state();
     t.must(st.battle, `B ended the fight with ${q.steps[k].as} (result ${st.result}): every boss can be walked away from`);
   });
@@ -492,32 +500,65 @@ export default function (suite, { data: D }) {
     t.must(low > 0, 'the battle screen leaves the bottom quarter of the canvas empty: it should use the full height once the bar is gone');
   });
 
-  suite.test('ui.battle.controls', 'battle: the controls shown are the ones that work, in words: A attacks, B runs, START is for items; no hint for something else', async (t) => {
-    await t.play(); await setup(t, `a.addItem('potion-of-healing')`); await fight(t, weak.id);
-    const lines = await t.lines(), hints = lines.filter((l) => /\b(A|B|START)\b\s*[:=]?\s*[A-Za-z]/.test(l) && !/attacks!/.test(l)).join(' | ');
-    const bad = [];
-    if (!/\bA\b\s*[:=]?\s*(attack|fight|strike)/i.test(hints)) bad.push('no "A: attack"');
-    if (!/\bB\b\s*[:=]?\s*(run|flee|escape)/i.test(hints)) bad.push('no "B: run"');
-    if (!/\bSTART\b\s*[:=]?\s*(item|drink|potion|bag|heal)/i.test(hints)) bad.push('no "START: items"');
-    if (/\bSTART\b\s*[:=]?\s*menu/i.test(hints)) bad.push('"START: menu" is shown, but START opens no menu in a battle');
-    const labels = lines.filter((l) => /^d\d+$/.test(l.trim()));
-    const blanks = lines.filter((l) => /^[?\-–]$/.test(l.trim()));
-    if (blanks.length) bad.push(`${blanks.length} boxes show a bare "?" or "-" with nothing to say what they are`);
-    if (labels.length) bad.push(`bare dice labels (${[...new Set(labels)].join(', ')}) stand under numbers that are not that die`);
+  // The battle screen the author chose (layout A, 22 Nov): a command menu Attack / Item / Run with a cursor; the roll told as a
+  // narration line; the foe's portrait (data/portraits.json, 32 x 32 at 2x) on a backdrop strip of the zone's biome; the whole canvas.
+  suite.test('ui.battle.menu', 'battle: a command menu Attack / Item / Run with a cursor: the arrows move it, A on Attack fights a round, Item opens the list of the bag and B backs out', async (t) => {
+    await t.play(); await setup(t, `a.addItem('potion-of-healing')`); await fight(t, weak.id); await t.ev('TA.setHp(99999)');
+    t.must(await hasMenu(t), `the battle shows no command menu with Attack, Item and Run under a cursor (it shows: ${JSON.stringify((await t.lines()).filter((l) => /attack|run|item|start/i.test(l)))})`);
+    t.must((await t.ev('T.marked()')).some((l) => /^Attack/i.test(l)), 'the cursor does not start on Attack (A alone must still fight a round)');
+    for (const w of ['Item', 'Run', 'Attack']) t.must(await t.cursorTo(new RegExp('^' + w + '\\b', 'i'), { max: 4 }), `the cursor never reaches "${w}"`);
+    const l0 = (await t.state()).log; await t.A(200); t.must((await t.state()).log > l0 || !(await t.state()).battle, 'A on Attack told nothing in the log');
+    if ((await t.state()).battle) { await t.readAll(); await cmd(t, 'Item', KEY.START);
+      t.must((await t.ev('T.marked()')).some((l) => row(D.item['potion-of-healing'].name).test(l)), 'Item opens no list of the bag with a cursor');
+      await t.B(200); t.must(await hasMenu(t) && (await t.state()).battle, 'B does not go back from the item list to the command menu'); }
     await setup(t, 'T.shut()');
-    t.must(!bad.length, `${bad.join('; ')} (hints drawn: ${hints || 'none'})`);
   });
 
-  suite.test('ui.battle.narration', 'battle: the log tells the fight in whole short sentences that name who acts, in varied words; win, loss and flight are told; nothing is cut in the log box', async (t) => {
+  suite.test('ui.battle.controls', 'battle: only controls that work are shown, in words: no "START: menu", no bare "?", "-" or die label', async (t) => {
+    await t.play(); await fight(t, weak.id);
+    const lines = await t.lines(), bad = [];
+    if (lines.some((l) => /\bSTART\b\s*[:=]?\s*menu/i.test(l))) bad.push('"START: menu" is shown, but START opens no menu in a battle');
+    const blanks = lines.filter((l) => /^[?\-–]$/.test(l.trim())), labels = lines.filter((l) => /^d\d+$/.test(l.trim()));
+    if (blanks.length) bad.push(`${blanks.length} boxes show a bare "?" or "-" with nothing to say what they are`);
+    if (labels.length) bad.push(`bare die labels (${[...new Set(labels)].join(', ')}) stand under numbers that are not that die`);
+    if (!['attack', 'run'].every((w) => lines.some((l) => new RegExp('\\b' + w + '\\b', 'i').test(l)))) bad.push('the words Attack and Run are not on the screen');
+    await setup(t, 'T.shut()');
+    t.must(!bad.length, bad.join('; '));
+  });
+
+  suite.test('ui.battle.portrait', 'battle: a foe with a portrait in data/portraits.json is drawn with it (32 x 32 at 2x); a foe without one keeps its old picture', async (t) => {
+    const P = D.portraits; t.must(P, 'data/portraits.json is missing: every foe is a 16 x 16 map picture drawn at 3x');
+    const map = P.monsters || P.portraits || P, ids = D.monsters.map((m) => m.id), with_ = ids.filter((id) => map[id]).slice(0, 3), without = ids.find((id) => !map[id]);
+    t.must(with_.length, 'data/portraits.json maps no creature of the data');
+    await t.play(); const bad = [], big = async () => (await t.ev('T.sprites()')).filter((x) => x.scene === 'UI' && x.scale >= 2).sort((a, b) => b.w * b.h - a.w * a.h)[0];
+    for (const id of with_) { await fight(t, id, 2); const f = await big(), e = map[id], fr = Array.isArray(e) ? e[e.length - 1] : e.frame;
+      if (!f || f.w !== 64 || f.h !== 64) bad.push(`${id}: the foe is drawn ${f ? f.w + ' x ' + f.h : 'not at all'}, not 64 x 64`); else if (fr != null && String(f.frame) !== String(fr)) bad.push(`${id}: frame ${f.frame}, the map says ${fr}`);
+      await setup(t, 'T.shut()'); await t.ev('T.idle()'); }
+    if (without) { await fight(t, without, 2); if (!(await big())) bad.push(`${without} (no portrait) is not drawn at all`); await setup(t, 'T.shut()'); }
+    t.must(!bad.length, bad.join('; '));
+  });
+
+  suite.test('ui.battle.backdrop', 'battle: the backdrop behind the fight is the zone\'s biome: the same foe in two biomes stands before two different pictures', async (t) => {
+    await t.play(); await setup(t, 'a.setEncounters(false)');
+    const zones = await hook(t, 'world.zones'), pick = [zones.find((z) => z.biome === 'volcanic'), zones.find((z) => z.biome === 'snow'), zones.find((z) => z.biome === 'forest' || z.biome === 'swamp')].filter(Boolean), sig = [];
+    for (const z of pick) { await t.ev(`T.go(${JSON.stringify(z.map)})`); await fight(t, weak.id, 2); sig.push(await t.signature(0, 36 / 192, 0.6, 100 / 192)); await setup(t, 'T.shut()'); await t.ev('T.idle()'); }
+    const d = []; for (let i = 0; i < sig.length; i++) for (let j = i + 1; j < sig.length; j++) d.push(sigDist(sig[i], sig[j]));
+    t.must(d.length && Math.min(...d) >= 0.2, `the battle looks the same in ${pick.map((z) => z.biome).join(', ')} (colour distance ${d.map((x) => x.toFixed(2)).join(', ')}; wanted 0.2 or more)`);
+  });
+
+  suite.test('ui.battle.narration', 'battle: the log tells the fight in whole short sentences (the roll as one line "d20: 15 + 5 = 20 vs AC 18"), naming who acts, in varied words; win and flight are told; no line over 29 letters, nothing cut', async (t) => {
     await t.play(); await setup(t, 'a.setEncounters(false)');
     const who = (await t.ev('T.hero().name')), foe = [...D.monsters].filter((m) => m.hp >= 60 && m.name.length >= 14).sort((a, b) => a.xp - b.xp)[0] || strong;
     await fight(t, foe.id, 3); await t.ev('TA.setHp(99999)');
     const cut = []; let log = [];
     for (let i = 0; i < 24 && (await t.state()).battle; i++) { await t.A(60); log = await t.ev('window.__game.battle.log.slice()');
-      const drawn = (await viewText(t)).toLowerCase().replace(/[^a-z0-9]/g, ''), lastLine = log[log.length - 1] || '';
+      const drawn = (await t.texts()).map((x) => x.text).join('\n').toLowerCase().replace(/[^a-z0-9]/g, ''), lastLine = String(log[log.length - 1] || '').split('\n').pop();
+      await t.ev(`window.__longest = Math.max(window.__longest || 0, ...T.lines().map(l => l.trimEnd().length))`);
       if ((await t.state()).battle && !drawn.includes(lastLine.toLowerCase().replace(/[^a-z0-9]/g, ''))) cut.push(lastLine); }
     await t.ev('TA.setHp(T.hero().maxHp)'); await setup(t, 'T.shut()');
-    const sentence = (l) => /^[A-Z"'].*[.!?…"']$/.test(l.trim()) && l.trim().split(/\s+/).length >= 3 && !/=/.test(l) && !/\b[A-Z]{3,}\b/.test(l.replace(/\bHP\b|\bXP\b|\bAC\b/g, ''));
+    log = log.flatMap((l) => String(l).split('\n')).filter((l) => l.trim());
+    const rollLine = (l) => /^d20: \d+ [+-] \d+ = \d+ vs AC \d+\.?$/.test(l.trim());    // layout A: the roll is one line of the telling
+    const sentence = (l) => rollLine(l) || (/^[A-Z"'].*[.!?…"']$/.test(l.trim()) && l.trim().split(/\s+/).length >= 2 && !/=/.test(l) && !/\b[A-Z]{3,}\b/.test(l.replace(/\bHP\b|\bXP\b|\bAC\b/g, '')));
     const names = (l) => new RegExp(`\\b(you|your|${esc(who)}|${esc(foe.name)}|${esc(foe.name.split(' ').pop())})\\b`, 'i').test(l);
     const notS = log.filter((l) => !sentence(l)), anon = log.filter((l) => !names(l));
     const shape = (l) => l.replace(/\d+/g, '#'), mine = new Set(log.filter((l) => /^(you|your)\b/i.test(l) || l.startsWith(who)).map(shape)), theirs = new Set(log.filter((l) => l.toLowerCase().includes(foe.name.toLowerCase().split(' ').pop()) && !(/^(you|your)\b/i.test(l) || l.startsWith(who))).map(shape));
@@ -525,11 +566,13 @@ export default function (suite, { data: D }) {
     const ends = {};
     t.must(await hook(t, `actions.forceBattle(${JSON.stringify(weak.id)})`), 'set-up: forceBattle returned false'); for (let i = 0; i < 80 && (await t.state()).battle; i++) await t.A(40);
     ends.win = await t.ev('window.__game.battle.log.slice(-1)[0]'); await t.readAll(); await setup(t, 'T.shut()'); await t.ev('T.idle()');
-    for (let i = 0; i < 30 && !ends.flee; i++) { await t.ev('TA.setHp(T.hero().maxHp)'); await hook(t, `actions.forceBattle(${JSON.stringify(weak.id)})`); await sleep(60); await t.B(120);
+    for (let i = 0; i < 30 && !ends.flee; i++) { await t.ev('TA.setHp(T.hero().maxHp)'); await hook(t, `actions.forceBattle(${JSON.stringify(weak.id)})`); await sleep(60); await cmd(t, 'Run', KEY.B); await t.readAll();
       if ((await t.state()).result === 'fled') ends.flee = await t.ev('window.__game.battle.log.slice(-1)[0]'); await setup(t, 'T.shut()'); await t.ev('T.idle()'); }
     const bad = [];
     if (notS.length) bad.push(`${notS.length} of ${log.length} log lines are not sentences, such as ${JSON.stringify(notS.slice(-2))}`);
-    if (anon.length) bad.push(`${anon.length} lines do not name who acts`);
+    if (anon.length > log.length * 2 / 3) bad.push(`only ${log.length - anon.length} of ${log.length} lines name who acts`);
+    const long = (await t.ev('window.__longest || 0'));
+    if (long > 29) bad.push(`a line of ${long} letters is drawn in the battle: the box holds 29`);
     if (mine.size < 3 || theirs.size < 3) bad.push(`the hero's blows are told in ${mine.size} ways and the foe's in ${theirs.size} (wanted at least 3 each over ${log.length} lines)`);
     for (const [k, l] of Object.entries(ends)) if (!l || !sentence(l)) bad.push(`the ${k} is not told in a sentence (${JSON.stringify(l || '')})`);
     if (!ends.flee) bad.push('no flight could be told (B never got away in 30 tries)');

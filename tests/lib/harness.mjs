@@ -46,13 +46,13 @@ const HELPERS = `window.T = {
   scenes() { return window.game.scene.getScenes(true); },
   texts() { const out = [], walk = (o, key, depth) => { if (!o.visible || o.alpha === 0) return;
       if (o.type === 'Container') { for (const c of o.list) walk(c, key, o.depth); return; }
-      if (o.type === 'Text' && o.text.trim()) { const b = o.getBounds(); out.push({ scene: key, text: o.text, depth: depth ?? o.depth, x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height) }); } };
+      if (o.type === 'Text' && o.text.trim()) { const b = o.getBounds(); out.push({ scene: key, text: o.text, rows: o.getWrappedText ? o.getWrappedText() : o.text.split('\\n'), depth: depth ?? o.depth, x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height) }); } };
     for (const s of T.scenes()) for (const o of s.children.list) walk(o, s.sys.settings.key);
     return out; },
-  lines() { return T.texts().flatMap(t => t.text.split('\\n')).map(s => s.trimEnd()).filter(s => s.trim()); },
+  lines() { return T.texts().flatMap(t => t.rows).map(s => s.trimEnd()).filter(s => s.trim()); },   // the lines as drawn (after word wrap)
   seen() { return T.texts().map(t => t.text).join('\\n'); },
   sees(re) { return T.lines().some(l => re.test(l)); },
-  marked() { return T.lines().filter(l => /^\\s*>/.test(l)).map(l => l.replace(/^\\s*>\\s*/, '').trim()); },   // the rows a cursor points at
+  marked() { return T.lines().filter(l => /^\\s*[>▶►]/.test(l)).map(l => l.replace(/^\\s*[>▶►]\\s*/, '').trim()); },   // the rows a cursor ('>' or '▶') points at
   // two texts of the same layer that lie over each other (a box drawn over an older screen hides it: other layers are not compared)
   overlaps() { const t = T.texts(), bad = [];
     for (let i = 0; i < t.length; i++) for (let j = i + 1; j < t.length; j++) { const a = t[i], b = t[j];
@@ -70,7 +70,7 @@ const HELPERS = `window.T = {
     for (const s of T.scenes()) for (const o of s.children.list) walk(o, s.sys.settings.key);
     return out; },
   // the title is up when a drawn line is exactly one of its entries (the game need not expose anything)
-  onTitle() { return T.lines().some(l => /^(press start|continue|new game)$/.test(l.replace(/^\\s*>\\s*/, '').replace(/\\s+/g, ' ').trim().toLowerCase())) ||
+  onTitle() { return T.lines().some(l => /^(press start|continue|new game)$/.test(l.replace(/^\\s*[>▶►]\\s*/, '').replace(/\\s+/g, ' ').trim().toLowerCase())) ||
     T.texts().some(t => /^press\\s+start$/i.test(t.text.trim())); },
 
   // ---- the hook, read ----
@@ -248,11 +248,11 @@ export function loadData(dir) {
   const j = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
   const opt = (f) => (fs.existsSync(path.join(dir, f)) ? j(f) : null);
   const world = j('data/world.json'), monsters = j('data/srd/monsters.json').monsters, items = j('data/srd/items.json').items, rules = j('data/srd/rules.json');
-  const sprites = opt('data/sprites.json'), defeat = opt('data/defeat.json');
+  const sprites = opt('data/sprites.json'), defeat = opt('data/defeat.json'), portraits = opt('data/portraits.json');
   const attribution = fs.existsSync(path.join(dir, 'data/srd/ATTRIBUTION.md')) ? fs.readFileSync(path.join(dir, 'data/srd/ATTRIBUTION.md'), 'utf8') : '';
   const mon = Object.fromEntries(monsters.map((m) => [m.id, m])), item = Object.fromEntries(items.map((i) => [i.id, i]));
   const thing = { ...Object.fromEntries((world.quest_items || []).map((i) => [i.id, i])), ...item };
   const quests = [...world.quests.main.map((q, i) => ({ ...q, kind: 'main', index: i })), ...world.quests.side.map((q, i) => ({ ...q, kind: 'side', index: i }))];
   const nameOf = (id) => (thing[id] ? thing[id].name : id);
-  return { dir, world, monsters, items, rules, sprites, defeat, attribution, mon, item, thing, quests, nameOf };
+  return { dir, world, monsters, items, rules, sprites, defeat, portraits, attribution, mon, item, thing, quests, nameOf };
 }

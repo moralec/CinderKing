@@ -215,7 +215,7 @@
   "ui.battle.nobox": {
    "why": "round 3's dark stage: 33-74 % of the area around the foe is near-black",
    "ref": "author on v0.6, item 3 (black background)",
-   "fix": "round 4"
+   "fix": "round 4 (battle screen)"
   },
   "ui.map.foes": {
    "why": "19 of 20 quest foes are drawn on the map with a frame of the town sheet, not their picture of sprites.json",
@@ -250,12 +250,12 @@
   "ui.battle.controls": {
    "why": "\"START: menu\" is shown in a battle where START opens no menu; dice boxes are labelled d8 whatever the die; bare \"?\" and \"-\"",
    "ref": "author on v0.6, item 6 and 10",
-   "fix": "round 4"
+   "fix": "round 4 (battle screen)"
   },
   "ui.battle.narration": {
    "why": "the log is roll arithmetic (\"You roll 20+6=26 HIT\"), not narration",
    "ref": "author on v0.6, item 9",
-   "fix": "round 4"
+   "fix": "round 4 (battle screen)"
   },
   "ui.chests.loot": {
    "why": "no chest in a house gives loot",
@@ -270,12 +270,27 @@
   "ui.status.maponly": {
    "why": "the status bar is drawn in battles; the battle screen uses only the top three quarters",
    "ref": "author on v0.6, item 13",
-   "fix": "round 4"
+   "fix": "round 4 (battle screen)"
   },
   "ui.defeat.home": {
    "why": "round 3 wakes the hero in the nearest settlement, which is often another town",
    "ref": "author on v0.6, item 14",
    "fix": "round 4 step 3 (rest and defeat)"
+  },
+  "ui.battle.menu": {
+   "why": "the battle has no command menu; A, B and START are bare keys",
+   "ref": "author on v0.6, items 6 and 10; decision: battle layout A",
+   "fix": "round 4 (battle screen)"
+  },
+  "ui.battle.portrait": {
+   "why": "no data/portraits.json: every foe is a 16 x 16 map picture at 3x",
+   "ref": "author on v0.6, decision: DCSS portraits at 2x",
+   "fix": "round 4 (battle screen)"
+  },
+  "ui.battle.backdrop": {
+   "why": "the battle ground is the same flat green in every zone",
+   "ref": "author on v0.6, decision: biome backdrop strip (also P3-9)",
+   "fix": "round 4 (battle screen)"
   }
  }
 }

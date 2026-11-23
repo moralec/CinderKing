@@ -63,8 +63,9 @@ driver), `adapter.mjs`, `gate.mjs` and `replay-rpg.mjs` (the build kit's rounds 
 - **Shop:** the first A on a ware asks, the second buys, B takes it back. ArrowRight shows the Sell list (the word "Sell" is on
   the screen); A sells for half the price.
 - **Rest:** A through an innkeeper's talk restores all HP for a fee in gold (the answer defaults to yes).
-- **Battle:** START drinks or opens a list of the bag (A takes the row). A drink costs the turn. B can fail, often enough to be
-  seen in 30 tries and not always (a chance between about 15 % and 85 %); it never works on a story boss.
+- **Battle rules:** a drink costs the turn. Run can fail, often enough to be seen in 30 tries and not always (a chance between
+  about 15 % and 85 %); it never works on a story boss. (On a build without the command menu the tests fall back to the old
+  keys: B runs, START drinks.)
 - **Saves:** the hook's `save()` and `load()` stay quick and ask nothing: the simulation loads a save before each of its fights.
   After the ending the game keeps the won state, so that Continue on the title returns to it.
 - **Ending:** the end card comes after the last line and stays; START rolls the credits (A turns pages); then the title, where
@@ -75,10 +76,14 @@ driver), `adapter.mjs`, `gate.mjs` and `replay-rpg.mjs` (the build kit's rounds 
 - **Status bar:** drawn while the hero walks the map (also under a dialogue box or the shop). Not on the title and not in a
   battle; the battle screen then uses the whole canvas.
 - **Text:** no text of the view ends below y 140, where every box of the view ends (dialogue, menu, shop, battle log).
-- **Battle screen:** hints in words for the keys that work there (A attack, B run, START items) and for no other; no bare "?",
-  "-" or die label. The foe stands on the battle ground: under a quarter of the area around its picture is near-black. The log
-  is narration: whole sentences that name who acts, at least three wordings each for the hero's and the foe's blows, the win,
-  the loss and the flight told too, each line drawn whole.
+- **Battle screen (layout A, the author's choice of 22 Nov):** the whole canvas, no status bar. A command menu Attack / Item /
+  Run with a cursor (`>` or `▶`) that starts on Attack every round, so A alone still fights; ArrowUp and ArrowDown move it; Item
+  opens the list of the bag (A takes a row, B goes back); Run can fail. No "START: menu", no bare "?", "-" or die label. The
+  telling: whole short sentences, the roll as one line (`d20: 15 + 5 = 20 vs AC 18`), names in at least a third of the lines,
+  three wordings or more each for the hero's and the foe's blows, the win and the flight told too, no drawn line over 29
+  letters and each line drawn whole. The foe's picture comes from `data/portraits.json` (monster id to `{ frame }`, 32 x 32
+  drawn at 2x) with the old picture as the fallback; under a quarter of the area around it is near-black; behind the fight is
+  a backdrop of the zone's biome (the same foe in two biomes: colour distance 0.2 or more).
 - **What a thing does:** in the shop and on the Items page, a piece of gear under the cursor shows the hero's armour class (or
   damage dice) now and with it, marked better or worse; a thing with no use says so. The Items page labels two groups, worn
   and bag, and the row under the cursor says what A does (drink, wear, take off).

@@ -43,6 +43,7 @@ bigger GPU.) Rows marked *code* must all be Local.
 | Harness gates (rounds 1-3 replay, drawing, zone looks) | Opus agent | Cloud | archetypes/game-phaser/testkit/gate.mjs |
 | Planners, feeder, feedback tool, coverage script | Claude sessions and agents | Cloud | bench/coding-semi/plan_local.py, plan_staged.py, feed_chunks.py, feedback_local.py, plan_coverage.py |
 | Checker (25 checks) | Fable (R4 kit) | Cloud | bench/coding-semi/check_game.mjs |
+| The game's own test suite (story, balance simulation, ui keys-only, data, engine, credits; 120 tests) | Fable, from the review and the author's feedback | Cloud | tests/ (replaces the R4 checker as the measure of content, author's decision 22 Nov) |
 | Visual grade | Claude Opus, blind, screenshots only | Cloud (measurement) | bench/coding-semi/judge_visual.py |
 
 ## Open items before the claim
