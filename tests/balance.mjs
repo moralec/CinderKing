@@ -43,6 +43,8 @@ export default function (suite, ctx) {
   async function newHero(t) {
     const fixed = await heroFixed(t);
     await t.play(); await t.ev('window.__game.actions.setEncounters(false)'); await t.ev(SIM);
+    // the gear the story gives before chapter 1 (meta.start.tutorial: a hero who starts empty-handed is armed by the tutorial)
+    await t.ev(`(() => { const a = window.__game.actions; for (const id of ${JSON.stringify((W.meta.start && W.meta.start.tutorial) || [])}) { a.addItem(id); a.equip(id); } return 1; })()`);
     if (!fixed) await t.ev(`TA.setStats(${JSON.stringify(TYPICAL)})`);
     return fixed;
   }

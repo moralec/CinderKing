@@ -62,7 +62,10 @@ export default function (suite, { data: D }) {
   const strong = [...D.monsters].sort((a, b) => b.xp - a.xp)[0];
   const BAG = ['potion-of-healing', 'potion-of-healing', 'chain-shirt', 'shield', 'longsword', 'dagger', 'torch', 'cloak-of-protection', 'ring-of-protection', 'rations-1-day', 'crowbar', 'frost-brand']
     .filter((id) => D.item[id]);
-  const fill = (t) => setup(t, `for (const id of ${JSON.stringify(BAG)}) a.addItem(id); a.setEncounters(false)`);
+  // the gear the story gives before chapter 1 (meta.start.tutorial): a hero who starts empty-handed is armed as the tutorial arms him
+  const TUTORIAL = ((W.meta.start && W.meta.start.tutorial) || []).filter((id) => D.item[id] && ['weapon', 'armor'].includes(D.item[id].kind));   // the weapon and the armour
+  const arm = (t) => setup(t, `for (const id of ${JSON.stringify(TUTORIAL)}) { const h = window.__game.party[0]; if (!Object.values(h.equipment).includes(id) && a.addItem(id)) a.equip(id); }`);
+  const fill = async (t) => { await arm(t); return setup(t, `for (const id of ${JSON.stringify(BAG)}) a.addItem(id); a.setEncounters(false)`); };
   const bagNames = [...new Set(BAG.map((id) => D.item[id].name))];
 
   // ---------------------------------------------------------------- title
@@ -180,7 +183,7 @@ export default function (suite, { data: D }) {
   });
 
   suite.test('ui.items.worn', 'menu: the gear the hero wears is shown (weapon and armour by name, on the Party or the Items page)', async (t) => {
-    await t.play();
+    await t.play(); await arm(t);
     const eq = (await t.ev('T.hero()')).equipment, names = [eq.weapon, eq.armor].filter(Boolean).map((id) => D.item[id].name);
     t.must(names.length === 2, `set-up: a new hero should hold a weapon and wear armour (${JSON.stringify(eq)})`);
     let all = ''; for (const o of ['Party', 'Items']) { await t.menu(o); all += (await t.lines()).join('\n') + '\n'; }
@@ -474,14 +477,14 @@ export default function (suite, { data: D }) {
   });
 
   suite.test('ui.shop.compare', 'shop: the ware under the cursor shows what it would change for the hero (armour class or damage: now and with it, better or worse)', async (t) => {
-    await t.play(); await setup(t, 'a.addGold(500); a.setEncounters(false)');
-    const m = W.npcs.find((n) => n.role === 'merchant' && n.stock.includes('chain-shirt') && n.stock.some((id) => D.item[id].kind === 'weapon')) || merchant;
-    const arm = D.item[m.stock.find((id) => D.item[id].kind === 'armor')], wep = D.item[m.stock.find((id) => D.item[id].kind === 'weapon' && D.item[id].damage !== D.item[W.meta.start.equipment.weapon].damage)];
-    const h = await t.ev('T.hero()'), ac1 = await t.ev(`(() => { const a = window.__game.actions; a.addItem(${JSON.stringify(arm.id)}); a.equip(${JSON.stringify(arm.id)}); const v = T.hero().ac; a.equip(${JSON.stringify(h.equipment.armor)}); return v; })()`);
+    await t.play(); await arm(t); await setup(t, 'a.addGold(500); a.setEncounters(false)');
+    const h = await t.ev('T.hero()'), m = W.npcs.find((n) => n.role === 'merchant' && n.stock.includes('chain-shirt') && n.stock.some((id) => D.item[id].kind === 'weapon')) || merchant;
+    const armour = D.item[m.stock.find((id) => D.item[id].kind === 'armor')], wep = D.item[m.stock.find((id) => D.item[id].kind === 'weapon' && D.item[id].damage !== D.item[h.equipment.weapon].damage)];
+    const ac1 = await t.ev(`(() => { const a = window.__game.actions; a.addItem(${JSON.stringify(armour.id)}); a.equip(${JSON.stringify(armour.id)}); const v = T.hero().ac; a.equip(${JSON.stringify(h.equipment.armor)}); return v; })()`);
     await openShop(t, m.id);
-    t.must(await t.cursorTo(row(arm.name), { max: m.stock.length + 2 }), `the cursor never reaches "${arm.name}"`);
+    t.must(await t.cursorTo(row(armour.name), { max: m.stock.length + 2 }), `the cursor never reaches "${armour.name}"`);
     let all = await viewText(t);
-    t.must(new RegExp(`\\b${h.ac}\\b[\\s\\S]{0,16}\\b${ac1}\\b`).test(all), `with the cursor on "${arm.name}" the shop does not show the hero's armour class now and with it (${h.ac} and ${ac1}); it shows only the name and the price`);
+    t.must(new RegExp(`\\b${h.ac}\\b[\\s\\S]{0,16}\\b${ac1}\\b`).test(all), `with the cursor on "${armour.name}" the shop does not show the hero's armour class now and with it (${h.ac} and ${ac1}); it shows only the name and the price`);
     t.must(/better|worse|same|▲|▼|\+\d/i.test(all), 'nothing marks the change as better or worse');
     t.must(await t.cursorTo(row(wep.name), { max: m.stock.length + 2, dir: 'up' }), `the cursor never reaches "${wep.name}"`); all = await viewText(t);
     t.must(all.includes(D.item[h.equipment.weapon].damage) && all.includes(wep.damage), `with the cursor on "${wep.name}" the shop does not show the damage now (${D.item[h.equipment.weapon].damage}) and with it (${wep.damage})`);
@@ -583,7 +586,9 @@ export default function (suite, { data: D }) {
 
   suite.test('ui.chests.loot', 'chests: every chest in a house (window.__game.chests) gives loot once, from the data\'s loot table, the same after a reload of the save, not the same in every game', async (t) => {
     const table = W.loot || (W.meta && W.meta.loot);
-    const open1 = async () => { await t.play(); await setup(t, 'a.setEncounters(false)'); return (await hook(t, 'chests')) || null; };
+    const open1 = async () => { await t.play(); await setup(t, 'a.setEncounters(false)'); const cs = (await hook(t, 'chests')) || null;
+      for (const c of cs || []) if (c.key) await setup(t, `a.addItem(${JSON.stringify(c.key)})`);   // a locked chest: its key, set up
+      return cs; };
     const chests = await open1();
     t.must(Array.isArray(chests) && chests.length, 'window.__game.chests is missing or empty: no house has a chest with loot');
     t.must(table, 'data/world.json has no `loot` table for chests');
